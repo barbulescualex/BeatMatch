@@ -4,24 +4,18 @@ import SpriteKit
 
 public class MidiButton : UIView, UIGestureRecognizerDelegate {
     private var player : AVAudioPlayer?
-    
-    private let sceneView = SKView()
-    private let scene = SKScene()
-    
-//    private lazy var pulse : SKEmitterNode = {
-//        let node = SKEmitterNode(fileNamed: "pulse.sks")
-//        node?.particleColor = .yellow
-//        return node!
-//    }()
-    
+    private var sound : Sounds!
 
-    public required init(frame: CGRect, sound: Sounds) {
-        super.init(frame: frame)
+    public required init(sound: Sounds) {
+        self.sound = sound
+        super.init(frame: .zero)
+        
         //initializing tap recognizer
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapped(_:)))
         tap.delegate = self
         addGestureRecognizer(tap)
-        setupPlayer(withSound: sound)
+        
+        setupPlayer()
         setupView()
     }
     
@@ -30,18 +24,12 @@ public class MidiButton : UIView, UIGestureRecognizerDelegate {
     }
     
     fileprivate func setupView(){
-        backgroundColor = .lightGray
+        backgroundColor = sound.color
+        alpha = 0.2
         layer.cornerRadius = 10
         clipsToBounds = true
         isUserInteractionEnabled = true
-        
-//        sceneView.frame = frame
-//        sceneView.backgroundColor = .clear
-//        addSubview(sceneView)
-//
-//        scene.size = frame.size
-//        scene.scaleMode = .aspectFit
-//        scene.backgroundColor = .clear
+        translatesAutoresizingMaskIntoConstraints = false
     }
     
     @objc func tapped(_ sender: UITapGestureRecognizer){
@@ -54,29 +42,16 @@ public class MidiButton : UIView, UIGestureRecognizerDelegate {
     }
     
     fileprivate func animatePressed(){
-//        let pulseAnimation = CABasicAnimation(keyPath: "opacity")
-//        pulseAnimation.duration = 30
-//        pulseAnimation.fromValue = 0
-//        pulseAnimation.toValue = 1
-//        pulseAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-//        pulseAnimation.autoreverses = true
-//        pulseAnimation.repeatCount = 0
-//        layer.add(pulseAnimation, forKey: nil)
-        
-//        pulse.position = sceneView.center
-//        scene.addChild(scene)
-//        sceneView.presentScene(scene)
-        
         UIView.animate(withDuration: 0.2, animations: {
-            self.backgroundColor = .yellow
+            self.alpha = 1
         }) { (_) in
             UIView.animate(withDuration: 0.2, animations: {
-                self.backgroundColor = .lightGray
+                self.alpha = 0.2
             })
         }
     }
     
-    fileprivate func setupPlayer(withSound sound : Sounds){
+    fileprivate func setupPlayer(){
         print(sound.rawValue, sound.fileExtension)
         guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: sound.fileExtension) else { return }
         print("found url")

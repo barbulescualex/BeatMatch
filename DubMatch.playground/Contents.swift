@@ -3,8 +3,7 @@
 import UIKit
 import PlaygroundSupport
 
-let button = MidiButton(frame: CGRect(x: 0, y: 0, width: 100, height: 100), sound: Sounds.chime)
-PlaygroundPage.current.liveView = button
+PlaygroundPage.current.liveView = MidiView(frame: CGRect(x: 0, y:0, width: 768, height: 1024))
 
 
 //chime : https://www.zapsplat.com/music/gamelan-ching-finger-cymbals-shake-crescendo/

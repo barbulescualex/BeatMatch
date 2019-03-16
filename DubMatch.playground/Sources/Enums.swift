@@ -1,4 +1,4 @@
-import Foundation
+import UIKit
 
 extension CaseIterable where AllCases.Element: Equatable {
     static func make(index: Int) -> Self {
@@ -36,6 +36,21 @@ public enum Sounds : String {
             return ext.aif.rawValue
         case .ghostSnare:
             return ext.wav.rawValue
+        }
+    }
+    
+    var color: UIColor {
+        switch self {
+        case .bass:
+            return UIColor.blue
+        case .snare:
+            return UIColor.purple
+        case .chime:
+            return UIColor.green
+        case .hiHat:
+            return UIColor.orange
+        case .ghostSnare:
+            return UIColor.yellow
         }
     }
 }
