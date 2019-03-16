@@ -3,8 +3,9 @@ import AVFoundation
 import SpriteKit
 
 public class MidiButton : UIView, UIGestureRecognizerDelegate {
-    private var player : AVAudioPlayer?
+   // private var player : AVAudioPlayer?
     private var sound : Sounds!
+    private var players = [AVAudioPlayer]()
 
     public required init(sound: Sounds) {
         self.sound = sound
@@ -15,7 +16,6 @@ public class MidiButton : UIView, UIGestureRecognizerDelegate {
         tap.delegate = self
         addGestureRecognizer(tap)
         
-        setupPlayer()
         setupView()
     }
     
@@ -29,16 +29,18 @@ public class MidiButton : UIView, UIGestureRecognizerDelegate {
         layer.cornerRadius = 10
         clipsToBounds = true
         isUserInteractionEnabled = true
+        isMultipleTouchEnabled = true
         translatesAutoresizingMaskIntoConstraints = false
     }
     
     @objc func tapped(_ sender: UITapGestureRecognizer){
         print("tapped")
         animatePressed()
-        if let player = player, player.isPlaying {
-            player.stop()
-        }
-        player?.play()
+        playSound()
+//        if let player = player, player.isPlaying {
+//            player.stop()
+//        }
+//        player?.play()
     }
     
     fileprivate func animatePressed(){
@@ -51,19 +53,28 @@ public class MidiButton : UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    fileprivate func setupPlayer(){
+    fileprivate func playSound(){
         print(sound.rawValue, sound.fileExtension)
         guard let url = Bundle.main.url(forResource: sound.rawValue, withExtension: sound.fileExtension) else { return }
         print("found url")
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
+//            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+//            try AVAudioSession.sharedInstance().setActive(true)
             
-            player = try AVAudioPlayer(contentsOf: url)
-            player?.prepareToPlay()
-        
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.delegate = self
+            players.append(player)
+            player.prepareToPlay()
+            print(player.play())
         } catch let error {
             print(error.localizedDescription)
         }
+    }
+}
+
+extension MidiButton : AVAudioPlayerDelegate {
+    public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        let index = players.firstIndex(of: player)!
+        players.remove(at: index)
     }
 }

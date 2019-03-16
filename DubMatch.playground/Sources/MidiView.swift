@@ -19,6 +19,8 @@ public class MidiView : UIView {
     
     fileprivate func setupMidi(){
         backgroundColor = .white
+        isMultipleTouchEnabled = true
+        isUserInteractionEnabled = true
         let stack = UIStackView(frame: frame)
         stack.axis = .vertical
         stack.distribution = .fillEqually
