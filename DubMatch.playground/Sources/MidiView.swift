@@ -37,7 +37,6 @@ public class MidiView : UIView {
     }
     
     fileprivate func setupMidi(){
-        print("setup midi called")
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = .clear
         layer.cornerRadius = 20

@@ -6,14 +6,7 @@ protocol MidiCellDelegate : AnyObject {
 }
 
 public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
-    public var sound : Sounds? {
-        didSet{
-            url = Bundle.main.url(forResource: sound!.rawValue, withExtension: sound!.fileExtension)
-        }
-    }
-    private var url : URL?
-    private var players = [AVAudioPlayer]()
-    
+    public var sound : Sounds?
     weak var delegate : MidiCellDelegate?
     
     private lazy var buttonArea : UIView = {
@@ -29,7 +22,6 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        print("midi cell init called")
         setupView()
     }
     
