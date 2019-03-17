@@ -21,6 +21,8 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         return view
     }()
     
+    private var light = UIView()
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         print("midi cell init called")
@@ -34,8 +36,8 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     fileprivate func setupView(){
         backgroundColor = .clear
         
+        //tap area
         addSubview(buttonArea)
-        
         buttonArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
         buttonArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
         buttonArea.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
@@ -45,6 +47,16 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         tap.delegate = self
         buttonArea.addGestureRecognizer(tap)
         
+        //light
+//        buttonArea.addSubview(light)
+//        light.backgroundColor = sound?.color
+//        let lightSide = CGFloat(100)
+//        light.translatesAutoresizingMaskIntoConstraints = false
+//        light.centerYAnchor.constraint(equalTo: buttonArea.centerYAnchor).isActive = true
+//        light.centerXAnchor.constraint(equalTo: buttonArea.centerXAnchor).isActive = true
+//        light.heightAnchor.constraint(equalToConstant: lightSide).isActive = true
+//        light.widthAnchor.constraint(equalToConstant: lightSide).isActive = true
+//        light.isHidden = false
     }
     
     @objc func tapped(_ sender: UITapGestureRecognizer){
@@ -54,12 +66,21 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     
     public func animate(){
         UIView.animate(withDuration: 0.1, animations: {
-           self.buttonArea.backgroundColor = self.sound?.color
+            //self.light.isHidden = false
+            self.buttonArea.backgroundColor = self.sound?.color
+           // self.buttonArea.alpha = 0.2
+//            light.backgroundColor = self.sound?.color
+//            light.transform = CGAffineTransform(scaleX: 2, y: 2)
         }) { (_) in
             UIView.animate(withDuration: 0.1, animations: {
                 self.buttonArea.backgroundColor = .lightGray
+             //   self.light.isHidden = true
+             //   self.buttonArea.alpha = 1
+//                light.backgroundColor = .clear
+//                light.transform = CGAffineTransform(scaleX: 1, y: 1)
             })
         }
+        //light.removeFromSuperview()
     }
     
     public func playSound(){

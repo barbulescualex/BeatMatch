@@ -66,7 +66,7 @@ public class GameViewController : UIViewController {
         midiView?.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         midiView?.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         midiView?.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        let midiHeight = view.bounds.height*0.25
+        let midiHeight = view.bounds.height*0.2
         midiView?.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
         
     }
