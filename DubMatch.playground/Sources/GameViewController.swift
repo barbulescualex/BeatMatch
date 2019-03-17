@@ -8,6 +8,7 @@ public class GameViewController : UIViewController {
         label.text = "Level:"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.textColor = .lightGray
+        label.textAlignment = .left
         return label
     }()
     
@@ -18,6 +19,7 @@ public class GameViewController : UIViewController {
         button.tintColor = .lightGray
         button.addTarget(self, action: #selector(restart(_:)), for: .touchUpInside)
         button.contentHorizontalAlignment = .right
+        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -41,8 +43,11 @@ public class GameViewController : UIViewController {
         //topstack
         let topStack = UIStackView()
         topStack.axis = .horizontal
-        topStack.distribution = .fillEqually
+        topStack.distribution = .fillProportionally
         topStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        resetButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        resetButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
         
         topStack.addArrangedSubview(levelLabel)
         topStack.addArrangedSubview(resetButton)
