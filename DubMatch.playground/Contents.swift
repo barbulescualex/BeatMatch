@@ -3,8 +3,7 @@
 import UIKit
 import PlaygroundSupport
 
-PlaygroundPage.current.liveView = MidiView(frame: CGRect(x: 0, y:0, width: 768, height: 1024))
-
+PlaygroundPage.current.liveView = MidiView(frame: CGRect(x: 0, y:0, width: 768, height: 512))
 
 //chime : https://www.zapsplat.com/music/gamelan-ching-finger-cymbals-shake-crescendo/
 //kick : http://music.arts.uci.edu/dobrian/summeracademy2014/sounds/drums/kick1.aiff

@@ -5,14 +5,9 @@ extension CaseIterable where AllCases.Element: Equatable {
         let a = Self.allCases
         return a[a.index(a.startIndex, offsetBy: index)]
     }
-    
-    func index() -> Int {
-        let a = Self.allCases
-        return a.distance(from: a.startIndex, to: a.firstIndex(of: self)!)
-    }
 }
 
-public enum Sounds : String {
+public enum Sounds : String, CaseIterable {
     case bass
     case snare
     case ghostSnare
