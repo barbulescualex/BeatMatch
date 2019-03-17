@@ -1,9 +1,13 @@
 import UIKit
-import PlaygroundSupport
+import AVFoundation
 
 public class MidiView : UIView {
     private var identifier = "cell"
-    private var sounds = [Sounds.bass,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat, Sounds.voice]
+    private var sounds = [Sounds.bass,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat]
+    
+    private var engine = AVAudioEngine()
+    private var players = [AVAudioPlayerNode]()
+    private var files = [AVAudioFile]()
     
     private lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -25,6 +29,7 @@ public class MidiView : UIView {
     public required init() {
         super.init(frame: .zero)
         setupMidi()
+        setupEngineAndPlayers()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -49,7 +54,6 @@ public class MidiView : UIView {
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleMoveGesture(_:)))
         collectionView.addGestureRecognizer(longPress)
-        
     }
     
     @objc func handleMoveGesture(_ sender : UILongPressGestureRecognizer){
@@ -69,6 +73,31 @@ public class MidiView : UIView {
 
     }
     
+    fileprivate func setupEngineAndPlayers(){
+        //populate players
+        for sound in sounds {
+            let url = Bundle.main.url(forResource: sound.rawValue, withExtension: sound.fileExtension)!
+            do {
+                let audioFile = try AVAudioFile(forReading: url)
+                files.append(audioFile)
+                let format = audioFile.processingFormat
+                let player = AVAudioPlayerNode()
+                players.append(player)
+                engine.attach(player)
+                engine.connect(player, to: engine.mainMixerNode, format: format)
+            } catch let error {
+                print(error.localizedDescription)
+            }
+        }
+        //setup engine
+        engine.prepare()
+        do {
+            try engine.start()
+        } catch {
+            print(error)
+        }
+    }
+    
 }
 
 extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -79,20 +108,18 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return 5
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as! MidiCell
         cell.sound = sounds[indexPath.item]
+        cell.delegate = self
         return cell
     }
     
     //selection
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        guard let cell = collectionView.cellForItem(at: indexPath) as? MidiCell else {return}
-//        cell.animate()
-//        cell.playSound()
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
@@ -101,12 +128,7 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
     
     //sizing
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-       // let side : CGFloat
-       // if (collectionView.bounds.width<collectionView.bounds.height){
-            let width = collectionView.bounds.width / 3 - 9
-//        } else {
-//            side = collectionView.bounds.height / 3 - 10
-//        }
+        let width = collectionView.bounds.width / 3 - 9
         let height = collectionView.bounds.height / 2 - 6
         return CGSize(width: width, height: height)
     }
@@ -120,6 +142,21 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
         let soundToMove = sounds[sourceIndexPath.item]
         sounds.remove(at: sourceIndexPath.item)
         sounds.insert(soundToMove, at: destinationIndexPath.item)
+        
+        let playerToMove = players[sourceIndexPath.item]
+        players.remove(at: sourceIndexPath.item)
+        players.insert(playerToMove, at: destinationIndexPath.item)
+    }
+}
+
+extension MidiView : MidiCellDelegate {
+    func pressed(_ cell: MidiCell) {
+        cell.animate()
+        let index = sounds.firstIndex(of: cell.sound!)!
+        let player = players[index]
+        player.scheduleFile(files[index], at: nil, completionHandler: nil)
+        player.play()
+        print(players[index])
     }
 }
 
