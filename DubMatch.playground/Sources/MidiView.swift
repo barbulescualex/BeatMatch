@@ -16,13 +16,14 @@ public class MidiView : UIView {
         collectionView.isScrollEnabled = false
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.allowsMultipleSelection = true
         collectionView.register(MidiCell.self, forCellWithReuseIdentifier: identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
     
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    public required init() {
+        super.init(frame: .zero)
         setupMidi()
     }
     
@@ -32,7 +33,8 @@ public class MidiView : UIView {
     
     fileprivate func setupMidi(){
         print("setup midi called")
-        backgroundColor = .black
+        translatesAutoresizingMaskIntoConstraints = false
+        backgroundColor = .clear
         layer.cornerRadius = 20
         clipsToBounds = true
         isMultipleTouchEnabled = true
@@ -40,23 +42,14 @@ public class MidiView : UIView {
         
         //collection view
         addSubview(collectionView)
-        collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-        collectionView.topAnchor.constraint(equalTo: topAnchor, constant: 20).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10).isActive = true
+        collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
+        collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
+        collectionView.topAnchor.constraint(equalTo: topAnchor, constant: 0).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleMoveGesture(_:)))
         collectionView.addGestureRecognizer(longPress)
         
-        //label
-//        let label = UILabel()
-//        label.text = "WWDC 2019 Midi Controller"
-//        label.textColor = .black
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//
-//        addSubview(label)
-//        label.topAnchor.constraint(equalTo: topAnchor, constant: -2).isActive = true
-//        label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 2).isActive = true
     }
     
     @objc func handleMoveGesture(_ sender : UILongPressGestureRecognizer){
@@ -97,15 +90,25 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
     
     //selection
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? MidiCell else {return}
-        cell.animate()
-        cell.playSound()
+//        guard let cell = collectionView.cellForItem(at: indexPath) as? MidiCell else {return}
+//        cell.animate()
+//        cell.playSound()
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        return true
     }
     
     //sizing
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let side = collectionView.bounds.width / 3 - 10
-        return CGSize(width: side, height: side)
+       // let side : CGFloat
+       // if (collectionView.bounds.width<collectionView.bounds.height){
+            let width = collectionView.bounds.width / 3 - 9
+//        } else {
+//            side = collectionView.bounds.height / 3 - 10
+//        }
+        let height = collectionView.bounds.height / 2 - 6
+        return CGSize(width: width, height: height)
     }
     
     //moving

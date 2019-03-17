@@ -1,7 +1,7 @@
 import UIKit
 import AVFoundation
 
-public class MidiCell : UICollectionViewCell {
+public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     public var sound : Sounds? {
         didSet{
             url = Bundle.main.url(forResource: sound!.rawValue, withExtension: sound!.fileExtension)
@@ -15,11 +15,9 @@ public class MidiCell : UICollectionViewCell {
         view.layer.cornerRadius = 10
         view.clipsToBounds = true
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.isUserInteractionEnabled = true
+        view.isMultipleTouchEnabled = true
         view.backgroundColor = .lightGray
-        view.layer.shadowColor = UIColor.gray.cgColor
-        view.layer.shadowOffset = CGSize(width: 5, height: 5)
-        view.layer.shadowRadius = 5
-        view.layer.shadowOpacity = 0.5
         return view
     }()
     
@@ -42,6 +40,16 @@ public class MidiCell : UICollectionViewCell {
         buttonArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
         buttonArea.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
         buttonArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10).isActive = true
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped(_:)))
+        tap.delegate = self
+        buttonArea.addGestureRecognizer(tap)
+        
+    }
+    
+    @objc func tapped(_ sender: UITapGestureRecognizer){
+        animate()
+        playSound()
     }
     
     public func animate(){
@@ -56,13 +64,13 @@ public class MidiCell : UICollectionViewCell {
     
     public func playSound(){
         if (sound == Sounds.voice) {
-            let speechUtterance: AVSpeechUtterance = AVSpeechUtterance(string: "WWDC 2019")
-            speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-    
-            //speechUtterance.rate = 1
-            
-            let speechSynthesizer = AVSpeechSynthesizer()
-            speechSynthesizer.speak(speechUtterance)
+//            let speechUtterance: AVSpeechUtterance = AVSpeechUtterance(string: "WWDC 2019")
+//            speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+//
+//            //speechUtterance.rate = 1
+//            
+//            let speechSynthesizer = AVSpeechSynthesizer()
+//            speechSynthesizer.speak(speechUtterance)
             return
         }
         guard let url = url else {return}
