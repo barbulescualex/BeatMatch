@@ -3,7 +3,7 @@ import PlaygroundSupport
 
 public class MidiView : UIView {
     private var identifier = "cell"
-    private var sounds = [Sounds.bass,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat]
+    private var sounds = [Sounds.bass,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat, Sounds.voice]
     
     private lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -32,7 +32,7 @@ public class MidiView : UIView {
     
     fileprivate func setupMidi(){
         print("setup midi called")
-        backgroundColor = .gray
+        backgroundColor = .black
         layer.cornerRadius = 20
         clipsToBounds = true
         isMultipleTouchEnabled = true
@@ -53,7 +53,7 @@ public class MidiView : UIView {
 //        label.text = "WWDC 2019 Midi Controller"
 //        label.textColor = .black
 //        label.translatesAutoresizingMaskIntoConstraints = false
-//        
+//
 //        addSubview(label)
 //        label.topAnchor.constraint(equalTo: topAnchor, constant: -2).isActive = true
 //        label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 2).isActive = true
@@ -86,7 +86,7 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return 6
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

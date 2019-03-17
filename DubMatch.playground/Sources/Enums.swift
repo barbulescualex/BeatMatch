@@ -13,6 +13,7 @@ public enum Sounds : String, CaseIterable {
     case ghostSnare
     case hiHat
     case chime
+    case voice
     
     public enum ext : String {
         case mp3
@@ -31,6 +32,8 @@ public enum Sounds : String, CaseIterable {
             return ext.aif.rawValue
         case .ghostSnare:
             return ext.wav.rawValue
+        case .voice:
+            return ext.wav.rawValue
         }
     }
     
@@ -46,6 +49,8 @@ public enum Sounds : String, CaseIterable {
             return UIColor.orange
         case .ghostSnare:
             return UIColor.yellow
+        case .voice:
+            return UIColor.red
         }
     }
 }
