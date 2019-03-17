@@ -4,7 +4,7 @@ import AVFoundation
 public class GameViewController : UIViewController {
     private var engine = AVAudioEngine()
     
-    lazy var levelLabel : UILabel = {
+    private lazy var levelLabel : UILabel = {
         let label = UILabel()
         label.text = "Level:"
         label.font = UIFont.boldSystemFont(ofSize: 18)
@@ -13,7 +13,7 @@ public class GameViewController : UIViewController {
         return label
     }()
     
-    lazy var resetButton : UIButton = {
+    private lazy var resetButton : UIButton = {
         let button = UIButton()
         let image = UIImage(named: "restart")?.withRenderingMode(.alwaysTemplate)
         button.setImage(image, for: .normal)
@@ -24,7 +24,9 @@ public class GameViewController : UIViewController {
         return button
     }()
     
-    var midiView : MidiView?
+    private var visualizer : Visualizer!
+    
+    private var midiView : MidiView!
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -65,11 +67,19 @@ public class GameViewController : UIViewController {
         //midiview
         midiView = MidiView(engine: engine)
         view.addSubview(midiView!)
-        midiView?.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        midiView?.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        midiView?.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        midiView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        midiView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        midiView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         let midiHeight = view.bounds.height*0.2
-        midiView?.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
+        midiView.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
+        
+        //visualizer
+        visualizer = Visualizer(engine: engine)
+        view.addSubview(visualizer)
+        visualizer.topAnchor.constraint(equalTo: topStack.bottomAnchor).isActive = true
+        visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
+        visualizer.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        visualizer.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
     
     fileprivate func setupEngine(){
@@ -80,10 +90,6 @@ public class GameViewController : UIViewController {
             try engine.start()
         } catch {
             print(error)
-        }
-        
-        engine.mainMixerNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, time) in
-            
         }
     }
     
