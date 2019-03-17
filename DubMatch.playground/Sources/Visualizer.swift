@@ -63,8 +63,10 @@ public class Visualizer : UIView {
     
     public func setupEngineTap(){
         engine.mainMixerNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, time) in
-            let volume = CGFloat(self.getVolume(from: buffer, bufferSize: 1024)) + 1
-            self.aniamteCircle(volume: volume)
+            DispatchQueue.global(qos: .userInitiated).async{
+                let volume = CGFloat(self.getVolume(from: buffer, bufferSize: 1024)) + 1
+                self.aniamteCircle(volume: volume)
+            }
         }
     }
     
