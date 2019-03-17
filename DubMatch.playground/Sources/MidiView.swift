@@ -6,7 +6,7 @@ public class MidiView : UIView {
     
     private var sounds = [Sounds.bass,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat]
     
-    private var engine = AVAudioEngine()
+    private var engine : AVAudioEngine
     
     private lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -25,14 +25,14 @@ public class MidiView : UIView {
         return collectionView
     }()
     
-    public required init() {
+    public required init(engine: AVAudioEngine) {
+        self.engine = engine
         super.init(frame: .zero)
         setupMidi()
-        setupEngine()
     }
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError()
     }
     
     fileprivate func setupMidi(){
@@ -70,18 +70,6 @@ public class MidiView : UIView {
         }
 
     }
-    
-    fileprivate func setupEngine(){
-        //setup engine
-        engine.mainMixerNode //initialzing the output node to be able to start the engine
-        engine.prepare()
-        do {
-            try engine.start()
-        } catch {
-            print(error)
-        }
-    }
-    
 }
 
 extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {

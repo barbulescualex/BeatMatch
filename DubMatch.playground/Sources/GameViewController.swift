@@ -1,13 +1,14 @@
 import UIKit
-
+import AVFoundation
 
 public class GameViewController : UIViewController {
+    private var engine = AVAudioEngine()
     
     lazy var levelLabel : UILabel = {
         let label = UILabel()
         label.text = "Level:"
         label.font = UIFont.boldSystemFont(ofSize: 18)
-        label.textColor = .lightGray
+        label.textColor = .white
         label.textAlignment = .left
         return label
     }()
@@ -16,7 +17,7 @@ public class GameViewController : UIViewController {
         let button = UIButton()
         let image = UIImage(named: "restart")?.withRenderingMode(.alwaysTemplate)
         button.setImage(image, for: .normal)
-        button.tintColor = .lightGray
+        button.tintColor = .white
         button.addTarget(self, action: #selector(restart(_:)), for: .touchUpInside)
         button.contentHorizontalAlignment = .right
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -27,6 +28,7 @@ public class GameViewController : UIViewController {
     
     public init() {
         super.init(nibName: nil, bundle: nil)
+        setupEngine()
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -38,7 +40,7 @@ public class GameViewController : UIViewController {
     }
     
     fileprivate func setupViews(){
-        view.backgroundColor = .white
+        view.backgroundColor = .black
         
         //topstack
         let topStack = UIStackView()
@@ -61,14 +63,28 @@ public class GameViewController : UIViewController {
         print(view.bounds)
         
         //midiview
-        midiView = MidiView()
+        midiView = MidiView(engine: engine)
         view.addSubview(midiView!)
         midiView?.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         midiView?.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         midiView?.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         let midiHeight = view.bounds.height*0.2
         midiView?.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
+    }
+    
+    fileprivate func setupEngine(){
+        //setup engine
+        engine.mainMixerNode //initialzing the output node to be able to start the engine
+        engine.prepare()
+        do {
+            try engine.start()
+        } catch {
+            print(error)
+        }
         
+        engine.mainMixerNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, time) in
+            
+        }
     }
     
     @objc func restart(_ sender: UIButton){

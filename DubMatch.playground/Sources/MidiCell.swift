@@ -43,10 +43,10 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         
         //tap area
         addSubview(buttonArea)
-        buttonArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
-        buttonArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-        buttonArea.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
-        buttonArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10).isActive = true
+        buttonArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true
+        buttonArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5).isActive = true
+        buttonArea.topAnchor.constraint(equalTo: topAnchor, constant: 5).isActive = true
+        buttonArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5).isActive = true
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapped(_:)))
         tap.delegate = self
