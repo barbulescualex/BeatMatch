@@ -7,6 +7,15 @@ protocol MidiCellDelegate : AnyObject {
 
 public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     public var sound : Sounds?
+    public var engine : AVAudioEngine?{
+        didSet{
+            setupNode()
+        }
+    }
+    
+    private var player = AVAudioPlayerNode()
+    private var audioFile = AVAudioFile()
+    
     weak var delegate : MidiCellDelegate?
     
     private lazy var buttonArea : UIView = {
@@ -44,8 +53,25 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         buttonArea.addGestureRecognizer(tap)
     }
     
+    fileprivate func setupNode(){
+        let url = Bundle.main.url(forResource: sound!.rawValue, withExtension: sound!.fileExtension)!
+        do {
+            audioFile = try AVAudioFile(forReading: url)
+            let format = audioFile.processingFormat
+            engine!.attach(player)
+            engine!.connect(player, to: engine!.mainMixerNode, format: format)
+        } catch let error {
+            print(error.localizedDescription)
+        }
+    }
+    
     @objc func tapped(_ sender: UITapGestureRecognizer){
         delegate?.pressed(self)
+    }
+    
+    public func play(){
+        player.scheduleFile(audioFile, at: nil, completionHandler: nil)
+        player.play()
     }
     
     public func animate(){

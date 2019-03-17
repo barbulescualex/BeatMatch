@@ -3,11 +3,10 @@ import AVFoundation
 
 public class MidiView : UIView {
     private var identifier = "cell"
+    
     private var sounds = [Sounds.bass,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat]
     
     private var engine = AVAudioEngine()
-    private var players = [AVAudioPlayerNode]()
-    private var files = [AVAudioFile]()
     
     private lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -29,7 +28,7 @@ public class MidiView : UIView {
     public required init() {
         super.init(frame: .zero)
         setupMidi()
-        setupEngineAndPlayers()
+        setupEngine()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -72,23 +71,9 @@ public class MidiView : UIView {
 
     }
     
-    fileprivate func setupEngineAndPlayers(){
-        //populate players
-        for sound in sounds {
-            let url = Bundle.main.url(forResource: sound.rawValue, withExtension: sound.fileExtension)!
-            do {
-                let audioFile = try AVAudioFile(forReading: url)
-                files.append(audioFile)
-                let format = audioFile.processingFormat
-                let player = AVAudioPlayerNode()
-                players.append(player)
-                engine.attach(player)
-                engine.connect(player, to: engine.mainMixerNode, format: format)
-            } catch let error {
-                print(error.localizedDescription)
-            }
-        }
+    fileprivate func setupEngine(){
         //setup engine
+        engine.mainMixerNode //initialzing the output node to be able to start the engine
         engine.prepare()
         do {
             try engine.start()
@@ -113,6 +98,7 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as! MidiCell
         cell.sound = sounds[indexPath.item]
+        cell.engine = engine
         cell.delegate = self
         return cell
     }
@@ -141,21 +127,13 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
         let soundToMove = sounds[sourceIndexPath.item]
         sounds.remove(at: sourceIndexPath.item)
         sounds.insert(soundToMove, at: destinationIndexPath.item)
-        
-        let playerToMove = players[sourceIndexPath.item]
-        players.remove(at: sourceIndexPath.item)
-        players.insert(playerToMove, at: destinationIndexPath.item)
     }
 }
 
 extension MidiView : MidiCellDelegate {
     func pressed(_ cell: MidiCell) {
         cell.animate()
-        let index = sounds.firstIndex(of: cell.sound!)!
-        let player = players[index]
-        player.scheduleFile(files[index], at: nil, completionHandler: nil)
-        player.play()
-        print(players[index])
+        cell.play()
     }
 }
 
