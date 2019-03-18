@@ -8,6 +8,11 @@ public class Visualizer : UIView {
     private var metalView : MTKView!
     private var metalDevice : MTLDevice!
     private var metalQueue : MTLCommandQueue!
+    private var pipelineState: MTLRenderPipelineState!
+    
+//    let vertices = [Vertex(color: [1, 0, 0, 1], pos: [-1, -1]),
+//                    Vertex(color: [0, 1, 0, 1], pos: [0, 1]),
+//                    Vertex(color: [0, 0, 1, 1], pos: [1, -1])]
     
     let circle = UIView()
     
@@ -59,6 +64,12 @@ public class Visualizer : UIView {
         
         //metalQueue
         metalQueue = metalDevice.makeCommandQueue()!
+        
+        do {
+            pipelineState = try buildRenderPipelineWith(device: metalDevice, metalKitView: metalView)
+        } catch {
+            print(error)
+        }
     }
     
     public func setupEngineTap(){
@@ -132,6 +143,18 @@ extension Visualizer : MTKViewDelegate {
         renderEncoder.endEncoding()
         commandBuffer.present(view.currentDrawable!)
         commandBuffer.commit()
+    }
+    
+    func buildRenderPipelineWith(device: MTLDevice, metalKitView: MTKView) throws -> MTLRenderPipelineState {
+        let pipelineDescriptor = MTLRenderPipelineDescriptor()
+        
+        let library = device.makeDefaultLibrary()
+        pipelineDescriptor.vertexFunction = library?.makeFunction(name: "vertexShader")
+        pipelineDescriptor.fragmentFunction = library?.makeFunction(name: "fragmentShader")
+        
+        pipelineDescriptor.colorAttachments[0].pixelFormat = metalKitView.colorPixelFormat
+        
+        return try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
     }
 }
 
