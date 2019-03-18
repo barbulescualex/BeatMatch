@@ -9,10 +9,7 @@ public class Visualizer : UIView {
     private var metalDevice : MTLDevice!
     private var metalQueue : MTLCommandQueue!
     private var pipelineState: MTLRenderPipelineState!
-    
-//    let vertices = [Vertex(color: [1, 0, 0, 1], pos: [-1, -1]),
-//                    Vertex(color: [0, 1, 0, 1], pos: [0, 1]),
-//                    Vertex(color: [0, 0, 1, 1], pos: [1, -1])]
+    private var vertexBuffer: MTLBuffer!
     
     let circle = UIView()
     
@@ -20,7 +17,7 @@ public class Visualizer : UIView {
         self.engine = engine
         super.init(frame: .zero)
         setupView()
-        //setupMetal()
+        setupMetal()
         setupEngineTap()
     }
     
@@ -32,15 +29,15 @@ public class Visualizer : UIView {
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = .clear
         
-        addSubview(circle)
-        circle.translatesAutoresizingMaskIntoConstraints = false
-        circle.backgroundColor = .white
-        circle.layer.cornerRadius = 50
-        circle.clipsToBounds = true
-        circle.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        circle.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        circle.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        circle.heightAnchor.constraint(equalToConstant: 100).isActive = true
+//        addSubview(circle)
+//        circle.translatesAutoresizingMaskIntoConstraints = false
+//        circle.backgroundColor = .white
+//        circle.layer.cornerRadius = 50
+//        circle.clipsToBounds = true
+//        circle.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+//        circle.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+//        circle.widthAnchor.constraint(equalToConstant: 100).isActive = true
+//        circle.heightAnchor.constraint(equalToConstant: 100).isActive = true
     }
     
     fileprivate func setupMetal(){
@@ -59,17 +56,20 @@ public class Visualizer : UIView {
         //metalDevice
         metalDevice = MTLCreateSystemDefaultDevice()
         metalView.device = metalDevice
-        metalView.isPaused = true
-        metalView.enableSetNeedsDisplay = true
+//        metalView.isPaused = true
+//        metalView.enableSetNeedsDisplay = true
         
         //metalQueue
         metalQueue = metalDevice.makeCommandQueue()!
         
-        do {
-            pipelineState = try buildRenderPipelineWith(device: metalDevice, metalKitView: metalView)
-        } catch {
-            print(error)
-        }
+//        do {
+//            pipelineState = try buildRenderPipelineWith(device: metalDevice, metalKitView: metalView)
+//        } catch {
+//            print(error)
+//        }
+//
+//        //metal buffer
+//        vertexBuffer = metalDevice.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Vertex>.stride, options: [])!
     }
     
     public func setupEngineTap(){
@@ -135,11 +135,15 @@ extension Visualizer : MTKViewDelegate {
         guard let commandBuffer = metalQueue.makeCommandBuffer() else {return}
         guard let renderDescriptor = view.currentRenderPassDescriptor else {return}
         
-        renderDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0, 0, 0, 0)
+        renderDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(1, 0, 0, 1)
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderDescriptor) else {return}
-        
-        
-        
+//
+//        // We tell it what render pipeline to use
+////        renderEncoder.setRenderPipelineState(pipelineState)
+////        // What vertex buffer data to use
+////        renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+////        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+//
         renderEncoder.endEncoding()
         commandBuffer.present(view.currentDrawable!)
         commandBuffer.commit()
