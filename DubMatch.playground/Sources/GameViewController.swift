@@ -84,7 +84,7 @@ public class GameViewController : UIViewController {
     
     fileprivate func setupEngine(){
         //setup engine
-        engine.mainMixerNode //initialzing the output node to be able to start the engine
+        _ = engine.mainMixerNode //initialzing the output node to be able to start the engine
         engine.prepare()
         do {
             try engine.start()
