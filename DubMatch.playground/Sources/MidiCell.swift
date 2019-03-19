@@ -18,7 +18,9 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         }
     }
     
-    public var visualizer : Visualizer?
+    private var firstPlay = true
+    
+    //public var visualizer : Visualizer?
     
     
     private var player = AVAudioPlayerNode()
@@ -103,9 +105,6 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         } catch let error {
             print(error.localizedDescription)
         }
-        player.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, _) in
-            self.rms(from: buffer, with: 1024)
-        }
     }
     
     func rms(from buffer: AVAudioPCMBuffer, with bufferSize: UInt){
@@ -117,7 +116,6 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         val = val + 0.5
         if val == 0.5 {return}
         print(val, " from sound: ",sound!.rawValue)
-        //visualizer?.scaleValue = val
     }
     
     @objc func tapped(_ sender: UITapGestureRecognizer){
@@ -125,6 +123,12 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     
     public func play(){
+        if(firstPlay){
+            player.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, _) in
+                self.rms(from: buffer, with: 1024)
+            }
+            firstPlay = false
+        }
         player.scheduleFile(audioFile, at: nil, completionHandler: nil)
         player.play()
     }

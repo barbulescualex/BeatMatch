@@ -7,7 +7,6 @@ public class MidiView : UIView {
     private var sounds = [Sounds.bass,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat]
     
     private var engine : AVAudioEngine
-    private var visualizer : Visualizer?
     
     private lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -26,9 +25,8 @@ public class MidiView : UIView {
         return collectionView
     }()
     
-    public required init(engine: AVAudioEngine, visualizer: Visualizer) {
+    public required init(engine: AVAudioEngine) {
         self.engine = engine
-        self.visualizer = visualizer
         super.init(frame: .zero)
         setupMidi()
     }
@@ -89,7 +87,6 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as! MidiCell
         cell.sound = sounds[indexPath.item]
         cell.engine = engine
-        cell.visualizer = visualizer
         cell.delegate = self
         return cell
     }

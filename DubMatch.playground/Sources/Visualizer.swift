@@ -34,13 +34,13 @@ public class Visualizer : UIView {
     var vertices : [Vertex] = []
     let originVertice = Vertex(color: [1,1,1,1], pos: [0,0])
     
-    var scaleValue : Float = 0.5 {
+    var scaleValue : Float? {
         didSet{
-            uniform = [Uniform(scale: scaleValue)]
+            uniform = [Uniform(scale: scaleValue!)]
             uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-//            DispatchQueue.main.async {
-//                self.metalView.setNeedsDisplay()
-//            }
+            DispatchQueue.main.async {
+                self.metalView.setNeedsDisplay()
+            }
         }
     }
     
@@ -49,7 +49,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-        //setupMetal()
+        setupMetal()
         setupEngineTap()
     }
     
@@ -124,7 +124,7 @@ public class Visualizer : UIView {
         val = val + 0.5
         if val == 0.5 {return}
         print(val, "MAIN MIXER")
-        //scaleValue = val
+        scaleValue = val
     }
 }
 
