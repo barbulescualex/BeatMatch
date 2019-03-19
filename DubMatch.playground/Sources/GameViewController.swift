@@ -70,17 +70,17 @@ public class GameViewController : UIViewController {
         view.addSubview(visualizer)
         view.addSubview(midiView)
         visualizer.topAnchor.constraint(equalTo: topStack.bottomAnchor).isActive = true
-        visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
         visualizer.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         visualizer.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         //midiview
-        view.addSubview(midiView!)
         midiView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         midiView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         midiView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         let midiHeight = view.bounds.height*0.2
         midiView.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
+        
+        visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
     }
     
     fileprivate func setupEngine(){

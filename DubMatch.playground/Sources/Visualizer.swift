@@ -38,9 +38,9 @@ public class Visualizer : UIView {
         didSet{
             uniform = [Uniform(scale: scaleValue)]
             uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-            DispatchQueue.main.async {
-                self.metalView.setNeedsDisplay()
-            }
+//            DispatchQueue.main.async {
+//                self.metalView.setNeedsDisplay()
+//            }
         }
     }
     
@@ -49,7 +49,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-        setupMetal()
+        //setupMetal()
         setupEngineTap()
     }
     
@@ -122,9 +122,9 @@ public class Visualizer : UIView {
         vDSP_vsq(channelData, 1, channelData, 1, bufferSize) //square
         vDSP_meanv(channelData, 1, &val, bufferSize) //mean
         val = val + 0.5
-        print(val)
         if val == 0.5 {return}
-        scaleValue = val
+        print(val, "MAIN MIXER")
+        //scaleValue = val
     }
 }
 
