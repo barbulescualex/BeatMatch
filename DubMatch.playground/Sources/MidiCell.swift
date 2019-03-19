@@ -1,5 +1,6 @@
 import UIKit
 import AVFoundation
+import Accelerate
 
 protocol MidiCellDelegate : AnyObject {
     func pressed(_ cell: MidiCell)
@@ -16,6 +17,12 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
             setupNode()
         }
     }
+    public var visualizer : Visualizer? {
+        didSet{
+            tapEngine()
+        }
+    }
+    
     
     private var player = AVAudioPlayerNode()
     private var audioFile = AVAudioFile()
@@ -39,26 +46,6 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .clear
-        //blur and vibrancy
-//        let blur = UIBlurEffect(style: .extraLight)
-//        let vibrancy = UIVibrancyEffect(blurEffect: blur)
-//        let blurView = UIVisualEffectView(effect: blur)
-//        blurView.translatesAutoresizingMaskIntoConstraints = false
-//        let vibrancyView = UIVisualEffectView(effect: vibrancy)
-//        vibrancyView.translatesAutoresizingMaskIntoConstraints = false
-//
-//        view.addSubview(blurView)
-//        view.addSubview(vibrancyView)
-//
-//        vibrancyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-//        vibrancyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-//        vibrancyView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-//        vibrancyView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-//
-//        blurView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-//        blurView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-//        blurView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-//        blurView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         return view
     }()
     
@@ -113,11 +100,30 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         do {
             audioFile = try AVAudioFile(forReading: url)
             let format = audioFile.processingFormat
+            print(format)
             engine!.attach(player)
             engine!.connect(player, to: engine!.mainMixerNode, format: format)
         } catch let error {
             print(error.localizedDescription)
         }
+    }
+    
+    func tapEngine(){
+        player.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, _) in
+            self.visualizer?.rms(from: buffer, with: 1024)
+        }
+    }
+    
+    func rms(from buffer: AVAudioPCMBuffer, with bufferSize: UInt){
+        guard let channelData = buffer.floatChannelData?[0] else {return}
+        var val = Float(0);
+        
+        vDSP_vsq(channelData, 1, channelData, 1, bufferSize) //square
+        vDSP_meanv(channelData, 1, &val, bufferSize) //mean
+        val = val + 0.5
+        if val == 0.5 {return}
+        print(val, " from sound: ",sound!.rawValue)
+        visualizer?.scaleValue = val
     }
     
     @objc func tapped(_ sender: UITapGestureRecognizer){
