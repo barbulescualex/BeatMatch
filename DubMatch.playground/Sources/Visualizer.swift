@@ -22,8 +22,6 @@ public class Visualizer : UIView {
     private var pipelineState: MTLRenderPipelineState!
     private var vertexBuffer: MTLBuffer!
     
-    let circle = UIView()
-    
     struct Vertex {
         var color : simd_float4
         var pos : simd_float2
@@ -48,16 +46,6 @@ public class Visualizer : UIView {
     fileprivate func setupView(){
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = .clear
-        
-//        addSubview(circle)
-//        circle.translatesAutoresizingMaskIntoConstraints = false
-//        circle.backgroundColor = .white
-//        circle.layer.cornerRadius = 50
-//        circle.clipsToBounds = true
-//        circle.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-//        circle.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-//        circle.widthAnchor.constraint(equalToConstant: 100).isActive = true
-//        circle.heightAnchor.constraint(equalToConstant: 100).isActive = true
     }
     
     fileprivate func setupMetal(){
@@ -96,19 +84,6 @@ public class Visualizer : UIView {
         engine.mainMixerNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, time) in
             DispatchQueue.global(qos: .userInitiated).async{
                 let volume = CGFloat(self.getVolume(from: buffer, bufferSize: 1024)) + 1
-                self.aniamteCircle(volume: volume)
-            }
-        }
-    }
-    
-    fileprivate func aniamteCircle(volume: CGFloat){
-        DispatchQueue.main.async {
-            if volume > 1.1 {
-                print(volume)
-                self.circle.transform = CGAffineTransform.identity
-                self.circle.transform = CGAffineTransform(scaleX: volume , y: volume)
-            } else {
-                self.circle.transform = CGAffineTransform.identity
             }
         }
     }
