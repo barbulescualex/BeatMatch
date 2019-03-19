@@ -1,3 +1,6 @@
+#include <metal_stdlib>
+using namespace metal;
+
 struct VertexOut {
     float4 color;
     float4 pos [[position]];

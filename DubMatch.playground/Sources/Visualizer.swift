@@ -1,6 +1,17 @@
 import UIKit
 import AVFoundation
 import MetalKit
+import simd
+
+let top = "#include <metal_stdlib>\n"+"#include <simd/simd.h>\n"+"using namespace metal;"
+let vertexStruct = "struct Vertex {vector_float4 color; vector_float2 pos;};"
+let vertexOutStruct = "struct VertexOut{float4 color; float4 pos [[position]];};"
+//let vertexShader = "vertex VertexOut vertexShader(const device Vertex *vertexArray [[buffer(0)]], unsigned int vid [[vertex_id]]){};"
+//let fragmentShader = "fragment float4 fragmentShader(VertexOut interpolated [[stage_in]]){};"
+//let vertexShader = "vertex void vertexShader(){};"
+//let fragmentShader = "fragment void fragmentShader(){};"
+let vertexShader = "vertex VertexOut vertexShader(const device Vertex *vertexArray [[buffer(0)]], unsigned int vid [[vertex_id]]){Vertex in = vertexArray[vid];VertexOut out;out.color = in.color;out.pos = float4(in.pos.x, in.pos.y, 0, 1);return out;};"
+let fragmentShader = "fragment float4 fragmentShader(VertexOut interpolated [[stage_in]]){return interpolated.color;};"
 
 public class Visualizer : UIView {
     private var engine : AVAudioEngine
@@ -12,6 +23,15 @@ public class Visualizer : UIView {
     private var vertexBuffer: MTLBuffer!
     
     let circle = UIView()
+    
+    struct Vertex {
+        var color : simd_float4
+        var pos : simd_float2
+    }
+    
+    let vertices = [Vertex(color: [1, 0, 0, 1], pos: [-1, -1]),
+                    Vertex(color: [0, 1, 0, 1], pos: [0, 1]),
+                    Vertex(color: [0, 0, 1, 1], pos: [1, -1])]
     
     public required init(engine: AVAudioEngine) {
         self.engine = engine
@@ -62,14 +82,14 @@ public class Visualizer : UIView {
         //metalQueue
         metalQueue = metalDevice.makeCommandQueue()!
         
-//        do {
-//            pipelineState = try buildRenderPipelineWith(device: metalDevice, metalKitView: metalView)
-//        } catch {
-//            print(error)
-//        }
-//
-//        //metal buffer
-//        vertexBuffer = metalDevice.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Vertex>.stride, options: [])!
+        do {
+            pipelineState = try buildRenderPipelineWith(device: metalDevice, metalKitView: metalView)
+        } catch {
+            print(error)
+        }
+
+        //metal buffer
+        vertexBuffer = metalDevice.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Vertex>.stride, options: [])!
     }
     
     public func setupEngineTap(){
@@ -137,13 +157,13 @@ extension Visualizer : MTKViewDelegate {
         
         renderDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(1, 0, 0, 1)
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderDescriptor) else {return}
-//
-//        // We tell it what render pipeline to use
-////        renderEncoder.setRenderPipelineState(pipelineState)
-////        // What vertex buffer data to use
-////        renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-////        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
-//
+
+        //We tell it what render pipeline to use
+        renderEncoder.setRenderPipelineState(pipelineState)
+        // What vertex buffer data to use
+        renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
+        renderEncoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+
         renderEncoder.endEncoding()
         commandBuffer.present(view.currentDrawable!)
         commandBuffer.commit()
@@ -151,10 +171,10 @@ extension Visualizer : MTKViewDelegate {
     
     func buildRenderPipelineWith(device: MTLDevice, metalKitView: MTKView) throws -> MTLRenderPipelineState {
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        
-        let library = device.makeDefaultLibrary()
-        pipelineDescriptor.vertexFunction = library?.makeFunction(name: "vertexShader")
-        pipelineDescriptor.fragmentFunction = library?.makeFunction(name: "fragmentShader")
+        let shader = top + vertexStruct + vertexOutStruct + vertexShader + fragmentShader
+        let library = try! device.makeLibrary(source: shader, options: nil)
+        pipelineDescriptor.vertexFunction = library.makeFunction(name: "vertexShader")
+        pipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragmentShader")
         
         pipelineDescriptor.colorAttachments[0].pixelFormat = metalKitView.colorPixelFormat
         
