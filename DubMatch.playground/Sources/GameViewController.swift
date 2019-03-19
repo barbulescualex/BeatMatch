@@ -79,7 +79,6 @@ public class GameViewController : UIViewController {
         midiView.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
         
         visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
-        
     }
     
     fileprivate func setupEngine(){
