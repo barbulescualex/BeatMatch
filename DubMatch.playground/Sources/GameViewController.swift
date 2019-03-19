@@ -62,23 +62,24 @@ public class GameViewController : UIViewController {
         topStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -3).isActive = true
         topStack.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        
-        //midiview
-        midiView = MidiView(engine: engine)
+        //visualizer
+        visualizer = Visualizer(engine: engine)
+        midiView = MidiView(engine: engine, vis: visualizer)
+        view.addSubview(visualizer)
         view.addSubview(midiView)
+        visualizer.topAnchor.constraint(equalTo: topStack.bottomAnchor).isActive = true
+        visualizer.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        visualizer.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        
         midiView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         midiView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         midiView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         let midiHeight = view.bounds.height*0.2
         midiView.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
         
-        //visualizer
-        visualizer = Visualizer(engine: engine)
-        view.addSubview(visualizer)
-        visualizer.topAnchor.constraint(equalTo: topStack.bottomAnchor).isActive = true
-        visualizer.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
-        visualizer.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
     }
     
     fileprivate func setupEngine(){

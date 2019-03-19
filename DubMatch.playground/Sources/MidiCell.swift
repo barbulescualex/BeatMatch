@@ -19,9 +19,7 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     
     private var firstPlay = true
-    
-    //public var visualizer : Visualizer?
-    
+    public var visualizer : Visualizer?
     
     private var player = AVAudioPlayerNode()
     private var audioFile = AVAudioFile()
@@ -116,6 +114,7 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         val = val + 0.5
         if val == 0.5 {return}
         print(val, " from sound: ",sound!.rawValue)
+        visualizer?.scaleValue = val
     }
     
     @objc func tapped(_ sender: UITapGestureRecognizer){
