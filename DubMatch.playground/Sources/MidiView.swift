@@ -92,7 +92,7 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
         cell.sound = sounds[indexPath.item]
         cell.engine = engine
         cell.visualizer = visualizer
-        cell.delegate = self
+        cell.delegate = AVCoordinator.shared
         if !cellSwapped.0 {
             AVCoordinator.shared.cells.append(cell)
         } else {

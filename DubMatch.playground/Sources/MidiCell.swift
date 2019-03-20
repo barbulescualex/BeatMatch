@@ -115,11 +115,13 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         val = val + 0.3
         if val == 0.3 {return}
         if (val > 0.9) {val = 0.9}
-        print(val, " from sound: ",sound!.rawValue)
+        //print(val, " from sound: ",sound!.rawValue)
         visualizer?.scaleValue = val
     }
     
     @objc func tapped(_ sender: UITapGestureRecognizer){
+        play()
+        animate()
         delegate?.pressed(self)
     }
     

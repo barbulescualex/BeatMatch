@@ -42,6 +42,8 @@ public class GameViewController : UIViewController {
     }
     
     public override func viewDidLoad() {
+        NotificationCenter.default.addObserver(self, selector: #selector(levelFailed(notification:)), name: .failed, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(levelPassed(notification:)), name: .passed, object: nil)
         setupViews()
     }
     
@@ -103,8 +105,22 @@ public class GameViewController : UIViewController {
     }
     
     @objc func restart(_ sender: UIButton){
-        let pattern = "112 112 1121112"
-        AVCoordinator.shared.play(from: pattern)
+        let pattern = "001 001 0010001"
+        AVCoordinator.shared.stringToTestFor = pattern
     }
+    
+    @objc func levelFailed(notification: NSNotification){
+        print("level failed")
+    }
+    
+    @objc func levelPassed(notification: NSNotification){
+        print("level passed")
+    }
+    
+}
+
+extension Notification.Name {
+    static let passed = Notification.Name("passed")
+    static let failed = Notification.Name("failed")
 }
 

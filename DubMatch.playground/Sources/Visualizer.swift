@@ -132,7 +132,7 @@ public class Visualizer : UIView {
             }
         }
         if (val > 0.9) {val = 0.9}
-        print(val, "MAIN MIXER")
+        //print(val, "MAIN MIXER")
         scaleValue = val
     }
 }

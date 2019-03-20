@@ -5,6 +5,7 @@ public final class AVCoordinator {
     static let shared = AVCoordinator()
     public var cells : [MidiCell] = []
     
+    //Playing
     public func play(from text: String){
         var iterator = 0
         let count = text.count
@@ -30,8 +31,68 @@ public final class AVCoordinator {
         
         guard let index = Int(str) else {return}
         if !cells.indices.contains(index) {return}
-        let cell = cells[index-1]
+        let cell = cells[index]
         cell.play()
         cell.animate()
+    }
+    
+    
+    //Testing
+    private var testing = false
+    
+    public var stringToTestFor : String? {
+        didSet{
+            guard let string = stringToTestFor else {return}
+            testing = true
+            let str = string.components(separatedBy: .whitespaces)
+            stringToTestFor = str.joined()
+        }
+    }
+    
+    private var inputPressStream : String? {
+        didSet{
+            print("Current input: ", inputPressStream, "Checking against: ",stringToTestFor)
+            if inputPressStream != nil && testing {
+                for i in 0..<inputPressStream!.count {
+                    let inputIndex = inputPressStream!.index(inputPressStream!.startIndex, offsetBy: i)
+                    let testingIndex = stringToTestFor!.index(stringToTestFor!.startIndex, offsetBy: i)
+                    if inputPressStream![inputIndex] != stringToTestFor![testingIndex]{
+                        testingEnded(withResult: false)
+                        return
+                    }
+                }
+                
+                if inputPressStream?.count == stringToTestFor?.count {
+                    testingEnded(withResult: true)
+                }
+            }
+        }
+    }
+    
+    private func testingEnded(withResult result: Bool){
+        testing = false
+        stringToTestFor = nil
+        inputPressStream = nil
+        
+        if result {
+             NotificationCenter.default.post(name: .passed, object: nil)
+        } else {
+            NotificationCenter.default.post(name: .failed, object: nil)
+        }
+    }
+    
+}
+
+extension AVCoordinator : MidiCellDelegate {
+    func pressed(_ cell: MidiCell) {
+        if !testing {return}
+        guard let index = cells.firstIndex(of: cell) else {return}
+        print("found index of cell from delegate")
+        let char = Character(String(index))
+        if inputPressStream != nil {
+            inputPressStream!.append(char)
+        } else {
+            inputPressStream = String(char)
+        }
     }
 }
