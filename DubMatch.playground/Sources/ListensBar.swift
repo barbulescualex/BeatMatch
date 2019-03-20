@@ -22,7 +22,7 @@ public class ListensBar : UIStackView {
             let label = UILabel()
             label.font = UIFont.systemFont(ofSize: 20)
             label.text = "🔉"
-            addSubview(label)
+            addArrangedSubview(label)
             labels.append(label)
         }
     }
@@ -38,6 +38,13 @@ public class ListensBar : UIStackView {
             self.labels[0].isHidden = false
             self.labels[1].isHidden = false
             self.labels[2].isHidden = false
+        }
+        UIView.animate(withDuration: 0.1, animations: {
+            self.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+        }) { (_) in
+            UIView.animate(withDuration: 0.1, animations: {
+                self.transform = CGAffineTransform.identity
+            })
         }
     }
 }

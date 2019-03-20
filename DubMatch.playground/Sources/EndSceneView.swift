@@ -76,7 +76,6 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         translatesAutoresizingMaskIntoConstraints = false
         //for pop up look
         layer.zPosition = 100
-        layer.cornerRadius = 20
         clipsToBounds = true
         
         //background view
@@ -93,9 +92,9 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         //view area
         addSubview(viewArea)
         viewArea.topAnchor.constraint(equalTo: topAnchor, constant: 200).isActive = true
-        viewArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -100).isActive = true
-        viewArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
-        viewArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
+        viewArea.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -200).isActive = true
+        viewArea.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 30).isActive = true
+        viewArea.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30).isActive = true
     
         //title label
         let label = UILabel()

@@ -135,6 +135,7 @@ public class GameViewController : UIViewController {
 
 extension GameViewController : EndSceneViewDelegate {
     func closeView(_ sender: EndSceneView) {
+        sender.removeFromSuperview()
         level = 0
         lifeBar.reset()
         listensBar.reset()
