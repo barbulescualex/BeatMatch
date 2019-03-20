@@ -2,8 +2,11 @@ import UIKit
 import AVFoundation
 
 public class GameViewController : UIViewController {
+    //MARK:- VARS
     private var engine = AVAudioEngine()
+    private var level = 0
     
+    //MARK:- VIEW COMPONENTS
     private lazy var levelLabel : UILabel = {
         let label = UILabel()
         label.text = "Level:"
@@ -24,8 +27,8 @@ public class GameViewController : UIViewController {
         return button
     }()
     
-    private var visualizer : Visualizer!
     
+    private var visualizer : Visualizer!
     private var midiView : MidiView!
     
     public init() {
