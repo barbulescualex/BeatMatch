@@ -148,9 +148,7 @@ extension Visualizer : MTKViewDelegate {
         renderDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0, 0, 0, 0)
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderDescriptor) else {return}
 
-        //We tell it what render pipeline to use
         renderEncoder.setRenderPipelineState(pipelineState)
-        // What vertex buffer data to use
         renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
         renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
         renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: vertices.count)
