@@ -51,7 +51,6 @@ public final class AVCoordinator {
     
     private var inputPressStream : String? {
         didSet{
-            print("Current input: ", inputPressStream, "Checking against: ",stringToTestFor)
             if inputPressStream != nil && testing {
                 for i in 0..<inputPressStream!.count {
                     let inputIndex = inputPressStream!.index(inputPressStream!.startIndex, offsetBy: i)
@@ -80,6 +79,8 @@ public final class AVCoordinator {
             NotificationCenter.default.post(name: .failed, object: nil)
         }
     }
+    
+    //Visualizer
     
 }
 

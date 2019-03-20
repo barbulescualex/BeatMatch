@@ -31,6 +31,7 @@ public class GameViewController : UIViewController {
     private var visualizer : Visualizer!
     private var midiView : MidiView!
     private var lifeBar = LifeBar()
+    private var listensBar = ListensBar()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -86,11 +87,17 @@ public class GameViewController : UIViewController {
         
         visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
         
-        //Lifebar
+        //LifeBar
         view.addSubview(lifeBar)
         lifeBar.topAnchor.constraint(equalTo: topStack.bottomAnchor).isActive = true
         lifeBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 3).isActive = true
         lifeBar.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        
+        //ListensBar
+        view.addSubview(listensBar)
+        listensBar.bottomAnchor.constraint(equalTo: midiView.topAnchor, constant: -5).isActive = true
+        listensBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 5).isActive = true
+        listensBar.heightAnchor.constraint(equalToConstant: 20).isActive = true
     }
     
     fileprivate func setupEngine(){
