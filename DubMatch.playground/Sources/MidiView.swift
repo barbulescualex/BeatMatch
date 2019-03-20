@@ -8,6 +8,7 @@ public class MidiView : UIView {
     
     private var engine : AVAudioEngine
     private var visualizer : Visualizer?
+    private var cellSwapped = (false,0,0) //Flag for our AVCoordinator to swap cell from index to index
     
     private lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -86,11 +87,22 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        print("cell init called")
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as! MidiCell
         cell.sound = sounds[indexPath.item]
         cell.engine = engine
         cell.visualizer = visualizer
         cell.delegate = self
+        if !cellSwapped.0 {
+            AVCoordinator.shared.cells.append(cell)
+        } else {
+            let swapFrom = cellSwapped.1
+            let swapTo = cellSwapped.2
+            AVCoordinator.shared.cells.remove(at: swapFrom)
+            print("removed")
+            AVCoordinator.shared.cells.insert(cell, at: swapTo)
+            cellSwapped = (false,0,0)
+        }
         return cell
     }
     
@@ -118,6 +130,7 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
         let soundToMove = sounds[sourceIndexPath.item]
         sounds.remove(at: sourceIndexPath.item)
         sounds.insert(soundToMove, at: destinationIndexPath.item)
+        cellSwapped = (true, sourceIndexPath.item, destinationIndexPath.item)
     }
 }
 

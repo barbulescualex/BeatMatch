@@ -84,7 +84,6 @@ public class GameViewController : UIViewController {
         
         visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
         
-        
         //Lifebar
         view.addSubview(lifeBar)
         lifeBar.topAnchor.constraint(equalTo: topStack.bottomAnchor).isActive = true

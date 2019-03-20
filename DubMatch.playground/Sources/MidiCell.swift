@@ -56,6 +56,7 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
+        print("CELL INIT")
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -97,7 +98,7 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         do {
             audioFile = try AVAudioFile(forReading: url)
             let format = audioFile.processingFormat
-            print(format)
+            //print(format)
             engine!.attach(player)
             engine!.connect(player, to: engine!.mainMixerNode, format: format)
         } catch let error {
