@@ -5,6 +5,7 @@ public class GameViewController : UIViewController {
     //MARK:- VARS
     private var engine = AVAudioEngine()
     private var level = 0
+    private var levelPatterns = ["001 001 0010001","0321 0321 0303 0321","004121 444 333 13","041 041 04041 041 04"]
     
     //MARK:- VIEW COMPONENTS
     private lazy var levelLabel : UILabel = {
@@ -117,13 +118,27 @@ public class GameViewController : UIViewController {
     }
     
     @objc func levelFailed(notification: NSNotification){
-        print("level failed")
+        let gameOver = EndSceneView(type: .over)
+        gameOver.delegate = self
+        view.addSubview(gameOver)
+        gameOver.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        gameOver.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        gameOver.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        gameOver.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
     
     @objc func levelPassed(notification: NSNotification){
         print("level passed")
     }
     
+}
+
+extension GameViewController : EndSceneViewDelegate {
+    func closeView(_ sender: EndSceneView) {
+        level = 0
+        lifeBar.reset()
+        listensBar.reset()
+    }
 }
 
 extension Notification.Name {

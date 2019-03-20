@@ -6,7 +6,10 @@ public final class AVCoordinator {
     public var cells : [MidiCell] = []
     
     //Playing
+    public var playing = false
+    
     public func play(from text: String){
+        playing = true
         var iterator = 0
         let count = text.count
         var chars = [Character]()
@@ -19,6 +22,7 @@ public final class AVCoordinator {
             iterator = iterator + 1
             if (iterator == count) {
                 timer.invalidate()
+                self.playing = false
             }
         }
     }
