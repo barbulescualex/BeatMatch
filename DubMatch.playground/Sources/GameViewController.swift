@@ -4,13 +4,17 @@ import AVFoundation
 public class GameViewController : UIViewController {
     //MARK:- VARS
     private var engine = AVAudioEngine()
-    private var level = 0
+    private var level = 0 {
+        didSet{
+            levelLabel.text = "Level: \(level)"
+        }
+    }
     private var levelPatterns = ["001 001 0010001","0321 0321 0303 0321","004121 444 333 13","041 041 04041 041 04"]
     
     //MARK:- VIEW COMPONENTS
     private lazy var levelLabel : UILabel = {
         let label = UILabel()
-        label.text = "Level:"
+        label.text = "Level: 0"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.textColor = .white
         label.textAlignment = .left
