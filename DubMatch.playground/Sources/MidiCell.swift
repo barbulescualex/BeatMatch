@@ -142,4 +142,8 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
             })
         }
     }
+    
+    deinit {
+        player.removeTap(onBus: 0)
+    }
 }

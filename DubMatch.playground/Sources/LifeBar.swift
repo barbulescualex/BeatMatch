@@ -14,7 +14,7 @@ public class LifeBar : UILabel {
     
     fileprivate func setupView(){
         translatesAutoresizingMaskIntoConstraints = false
-        font = UIFont.systemFont(ofSize: 30)
+        font = UIFont.systemFont(ofSize: 20)
         text = "❤❤❤❤❤"
         textAlignment = .left
     }
