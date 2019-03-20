@@ -103,7 +103,8 @@ public class GameViewController : UIViewController {
     }
     
     @objc func restart(_ sender: UIButton){
-        
+        let pattern = "112 112 1121112"
+        AVCoordinator.shared.play(from: pattern)
     }
 }
 
