@@ -111,16 +111,16 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     @objc func tapped(_ sender: UITapGestureRecognizer){
         if AVCoordinator.shared.isPlaying || cellIsPlaying { return }
         play()
-        cellIsPlaying = true
+        //cellIsPlaying = true
         animate()
         delegate?.pressed(self)
     }
     
     public func play(){
         if(firstPlay){
-            player.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, _) in
-                AVCoordinator.shared.rms(from: buffer, with: 1024, cell: self)
-            }
+//            player.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, _) in
+//                AVCoordinator.shared.rms(from: buffer, with: 1024, cell: self)
+//            }
             firstPlay = false
         }
         player.scheduleFile(audioFile, at: nil, completionHandler: nil)

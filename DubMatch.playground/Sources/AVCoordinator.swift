@@ -94,7 +94,7 @@ public final class AVCoordinator {
     //Visualizer
     public var visualizer : Visualizer?
     private var normalSet = false
-    private var values = [Float]()
+    private var values : [Float] = [0.3]
     
     public func rms(from buffer: AVAudioPCMBuffer, with bufferSize: UInt, cell: MidiCell?){
         guard let channelData = buffer.floatChannelData?[0] else {return}
@@ -106,7 +106,7 @@ public final class AVCoordinator {
         if val == 0.3{ //makes sure it always ends up on 0.3 scale size
             cell?.cellIsPlaying = false
             if normalSet {
-                values = []
+                values = [0.3]
                 return
             } else {
                 normalSet = true
@@ -114,20 +114,26 @@ public final class AVCoordinator {
         } else {
             normalSet = false
         }
-        if (val > 0.6) {val = 0.6}
-        if (cell != nil){
-            print(val, cell?.sound?.rawValue)
-        } else {
-            print(val, "MAIN MIXER")
-        }
+        if (val > 0.5) {val = 0.5}
         values.append(val)
-        if values.count > 2 {
+        if values.count >= 2 {
             let current = val
             let previous = values[values.count-2]
+            
             let inbetween = (current + previous)/2
-            print(inbetween, "INBETWEEN")
+            let lowbetween = (inbetween + previous)/2
+            let highbetween = (inbetween + current)/2
+            
+            visualizer?.scaleValue = lowbetween
+            print(lowbetween," Low")
+            
             visualizer?.scaleValue = inbetween
+            print(inbetween, " In")
+            
+            visualizer?.scaleValue = highbetween
+            print(highbetween, " High")
         }
+        print(val, "VAL")
         visualizer?.scaleValue = val
     }
 }

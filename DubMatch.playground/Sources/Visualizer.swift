@@ -49,7 +49,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-//        setupMetal()
+        //setupMetal()
         setupEngineTap()
     }
     
@@ -114,8 +114,7 @@ public class Visualizer : UIView {
             AVCoordinator.shared.rms(from: buffer, with: 1024, cell: nil)
         }
     }
-    
-    //public var normalSet = false
+
 }
 
 extension Visualizer : MTKViewDelegate {
