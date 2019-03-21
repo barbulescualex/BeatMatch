@@ -37,10 +37,10 @@ public class Visualizer : UIView {
     var scaleValue : Float? {
         didSet{
             uniform = [Uniform(scale: scaleValue!)]
-//            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-//            DispatchQueue.main.async {
-//                self.metalView.setNeedsDisplay()
-//            }
+            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
+            DispatchQueue.main.async {
+                self.metalView.setNeedsDisplay()
+            }
         }
     }
     
@@ -49,7 +49,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-        //setupMetal()
+        setupMetal()
         setupEngineTap()
     }
     

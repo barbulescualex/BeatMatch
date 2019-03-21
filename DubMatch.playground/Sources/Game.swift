@@ -138,6 +138,7 @@ public class Game: UIViewController {
         level = 1
         lifeBar.reset()
         listensBar.reset()
+        listeningLabel.isHidden = true
     }
     
     @objc func levelFailed(notification: NSNotification){
