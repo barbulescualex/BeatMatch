@@ -84,6 +84,7 @@ public class Game: UIViewController {
         
         //visualizer
         visualizer = Visualizer(engine: engine)
+        AVCoordinator.shared.visualizer = visualizer
         midiView = MidiView(engine: engine, vis: visualizer)
         view.addSubview(visualizer)
         view.addSubview(midiView)

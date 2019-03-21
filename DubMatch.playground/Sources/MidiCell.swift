@@ -26,7 +26,7 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     
     weak var delegate : MidiCellDelegate?
     
-    private var cellIsPlaying = false
+    public var cellIsPlaying = false
     
     private lazy var buttonArea : UIView = {
         let view = UIView()
@@ -108,22 +108,6 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         }
     }
     
-    func rms(from buffer: AVAudioPCMBuffer, with bufferSize: UInt){
-        guard let channelData = buffer.floatChannelData?[0] else {return}
-        var val = Float(0);
-        
-        vDSP_vsq(channelData, 1, channelData, 1, bufferSize) //square
-        vDSP_meanv(channelData, 1, &val, bufferSize) //mean
-        val = val + 0.3
-        if val == 0.3 {
-            cellIsPlaying = false
-            return
-        }
-        if (val > 0.9) {val = 0.9}
-        //print(val, " from sound: ",sound!.rawValue)
-        visualizer?.scaleValue = val
-    }
-    
     @objc func tapped(_ sender: UITapGestureRecognizer){
         if AVCoordinator.shared.isPlaying || cellIsPlaying { return }
         play()
@@ -135,7 +119,7 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     public func play(){
         if(firstPlay){
             player.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, _) in
-                self.rms(from: buffer, with: 1024)
+                AVCoordinator.shared.rms(from: buffer, with: 1024, cell: self)
             }
             firstPlay = false
         }

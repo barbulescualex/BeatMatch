@@ -1,4 +1,6 @@
 import UIKit
+import AVFoundation
+import Accelerate
 
 //Audio Visual Coordinator
 public final class AVCoordinator {
@@ -90,7 +92,32 @@ public final class AVCoordinator {
     }
     
     //Visualizer
+    public var visualizer : Visualizer?
+    private var normalSet = false
     
+    public func rms(from buffer: AVAudioPCMBuffer, with bufferSize: UInt, cell: MidiCell?){
+        guard let channelData = buffer.floatChannelData?[0] else {return}
+        var val = Float(0);
+        
+        vDSP_vsq(channelData, 1, channelData, 1, bufferSize) //square
+        vDSP_meanv(channelData, 1, &val, bufferSize) //mean
+        val = val + 0.3
+        if val == 0.3{ //makes sure it always ends up on 0.3 scale size
+            cell?.cellIsPlaying = false
+            if normalSet {
+                return
+            } else {
+                normalSet = true
+            }
+        }
+        if (val > 0.9) {val = 0.9}
+        if (cell != nil){
+            print(val, cell?.sound?.rawValue)
+        } else {
+            print(val, "MAIN MIXER")
+        }
+        visualizer?.scaleValue = val
+    }
 }
 
 extension AVCoordinator : MidiCellDelegate {
