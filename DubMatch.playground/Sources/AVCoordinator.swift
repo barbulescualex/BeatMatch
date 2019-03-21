@@ -6,10 +6,10 @@ public final class AVCoordinator {
     public var cells : [MidiCell] = []
     
     //Playing
-    public var playing = false
+    public var isPlaying = false
     
     public func play(from text: String, completion: @escaping()->()){
-        playing = true
+        isPlaying = true
         var iterator = 0
         let count = text.count
         var chars = [Character]()
@@ -22,7 +22,7 @@ public final class AVCoordinator {
             iterator = iterator + 1
             if (iterator == count) {
                 timer.invalidate()
-                self.playing = false
+                self.isPlaying = false
                 completion()
             }
         }

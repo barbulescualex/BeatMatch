@@ -26,6 +26,8 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     
     weak var delegate : MidiCellDelegate?
     
+    private var cellIsPlaying = false
+    
     private lazy var buttonArea : UIView = {
         let view = UIView()
         view.layer.cornerRadius = 10
@@ -113,14 +115,19 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         vDSP_vsq(channelData, 1, channelData, 1, bufferSize) //square
         vDSP_meanv(channelData, 1, &val, bufferSize) //mean
         val = val + 0.3
-        if val == 0.3 {return}
+        if val == 0.3 {
+            cellIsPlaying = false
+            return
+        }
         if (val > 0.9) {val = 0.9}
         //print(val, " from sound: ",sound!.rawValue)
         visualizer?.scaleValue = val
     }
     
     @objc func tapped(_ sender: UITapGestureRecognizer){
+        if AVCoordinator.shared.isPlaying || cellIsPlaying { return }
         play()
+        cellIsPlaying = true
         animate()
         delegate?.pressed(self)
     }

@@ -59,7 +59,7 @@ public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
     }
     
     @objc func tapped(_ sender: UIGestureRecognizer){
-        if speakers != 0 {
+        if speakers != 0 && !AVCoordinator.shared.isPlaying{
               delegate?.listensBarTapped()
         }
     }

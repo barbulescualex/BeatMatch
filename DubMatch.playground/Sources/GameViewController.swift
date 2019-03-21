@@ -118,6 +118,7 @@ public class GameViewController : UIViewController {
     }
     
     @objc func restart(_ sender: UIButton){
+        if AVCoordinator.shared.isPlaying { return }
         level = 1
         lifeBar.reset()
         listensBar.reset()

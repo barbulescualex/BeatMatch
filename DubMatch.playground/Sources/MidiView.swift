@@ -58,6 +58,7 @@ public class MidiView : UIView {
     }
     
     @objc func handleMoveGesture(_ sender : UILongPressGestureRecognizer){
+        if AVCoordinator.shared.isPlaying { return }//no interaction with midi pad while sounds playing
         switch(sender.state) {
         case .began:
             guard let selectedIndexPath = collectionView.indexPathForItem(at: sender.location(in: collectionView)) else {
@@ -133,11 +134,3 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
         cellSwapped = (true, sourceIndexPath.item, destinationIndexPath.item)
     }
 }
-
-extension MidiView : MidiCellDelegate {
-    func pressed(_ cell: MidiCell) {
-        cell.animate()
-        cell.play()
-    }
-}
-
