@@ -8,7 +8,7 @@ public final class AVCoordinator {
     //Playing
     public var playing = false
     
-    public func play(from text: String){
+    public func play(from text: String, completion: @escaping()->()){
         playing = true
         var iterator = 0
         let count = text.count
@@ -23,6 +23,7 @@ public final class AVCoordinator {
             if (iterator == count) {
                 timer.invalidate()
                 self.playing = false
+                completion()
             }
         }
     }

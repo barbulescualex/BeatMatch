@@ -1,9 +1,14 @@
 import UIKit
 
+protocol ListensBarDelegate : AnyObject {
+    func listensBarTapped()
+}
 
-public class ListensBar : UIStackView {
+public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
     private var speakers = 3
     private var labels = [UILabel]()
+    
+    weak var delegate : ListensBarDelegate?
     
     public required init() {
         super.init(frame: .zero)
@@ -25,12 +30,16 @@ public class ListensBar : UIStackView {
             addArrangedSubview(label)
             labels.append(label)
         }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped(_:)))
+        tap.delegate = self
+        addGestureRecognizer(tap)
     }
     
     public func minusOne(){
         UIView.animate(withDuration: 0.2) {
             self.labels[self.speakers-1].isHidden = true
         }
+        speakers = speakers - 1
     }
     
     public func reset(){
@@ -45,6 +54,13 @@ public class ListensBar : UIStackView {
             UIView.animate(withDuration: 0.1, animations: {
                 self.transform = CGAffineTransform.identity
             })
+        }
+        speakers = 3
+    }
+    
+    @objc func tapped(_ sender: UIGestureRecognizer){
+        if speakers != 0 {
+              delegate?.listensBarTapped()
         }
     }
 }

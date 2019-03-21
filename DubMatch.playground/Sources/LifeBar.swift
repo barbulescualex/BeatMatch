@@ -1,7 +1,7 @@
 import UIKit
 
 public class LifeBar : UILabel {
-    private var hearts = 5
+    public var hearts = 5
     
     public required init() {
         super.init(frame: .zero)

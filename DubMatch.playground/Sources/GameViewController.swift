@@ -4,7 +4,7 @@ import AVFoundation
 public class GameViewController : UIViewController {
     //MARK:- VARS
     private var engine = AVAudioEngine()
-    private var level = 0 {
+    private var level = 1 {
         didSet{
             levelLabel.text = "Level: \(level)"
         }
@@ -100,6 +100,7 @@ public class GameViewController : UIViewController {
         
         //ListensBar
         view.addSubview(listensBar)
+        listensBar.delegate = self
         listensBar.bottomAnchor.constraint(equalTo: midiView.topAnchor, constant: -5).isActive = true
         listensBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 5).isActive = true
         listensBar.heightAnchor.constraint(equalToConstant: 20).isActive = true
@@ -117,22 +118,76 @@ public class GameViewController : UIViewController {
     }
     
     @objc func restart(_ sender: UIButton){
-        let pattern = "001 001 0010001"
-        AVCoordinator.shared.stringToTestFor = pattern
+        level = 1
+        lifeBar.reset()
+        listensBar.reset()
     }
     
     @objc func levelFailed(notification: NSNotification){
-        let gameOver = EndSceneView(type: .over)
-        gameOver.delegate = self
-        view.addSubview(gameOver)
-        gameOver.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        gameOver.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        gameOver.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        gameOver.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        print("level failed")
+        lifeBar.minusOne()
+        if (lifeBar.hearts == 0){//GAME OVER
+            let gameOver = EndSceneView(type: .over)
+            gameOver.delegate = self
+            view.addSubview(gameOver)
+            gameOver.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            gameOver.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            gameOver.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            gameOver.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        } else { //Awe:(
+            let awe = EmotionView(message: .AWE)
+            view.addSubview(awe)
+            awe.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            awe.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            awe.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            awe.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            awe.alpha = 0
+            UIView.animate(withDuration: 0.25, animations: {
+                awe.alpha = 1
+                awe.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+            }) { (_) in
+                UIView.animate(withDuration: 0.1, animations: {
+                    awe.transform = CGAffineTransform.identity
+                }, completion: { (_) in
+                    awe.removeFromSuperview()
+                })
+            }
+           
+        }
     }
     
     @objc func levelPassed(notification: NSNotification){
         print("level passed")
+        level = level + 1
+        listensBar.reset()
+        if(level == levelPatterns.count){//win!
+            let win = EndSceneView(type: .over)
+            win.delegate = self
+            view.addSubview(win)
+            win.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            win.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            win.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            win.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        } else {
+            let emotion = EmotionMessage.make(index: level)
+            let yay = EmotionView(message: emotion)
+            view.addSubview(yay)
+            yay.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+            yay.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            yay.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            yay.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            yay.alpha = 0
+            UIView.animate(withDuration: 0.25, animations: {
+                yay.alpha = 1
+                yay.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+            }) { (_) in
+                UIView.animate(withDuration: 0.1, animations: {
+                    yay.transform = CGAffineTransform.identity
+                }, completion: { (_) in
+                    yay.removeFromSuperview()
+                })
+            }
+        }
     }
     
 }
@@ -140,9 +195,19 @@ public class GameViewController : UIViewController {
 extension GameViewController : EndSceneViewDelegate {
     func closeView(_ sender: EndSceneView) {
         sender.removeFromSuperview()
-        level = 0
+        level = 1
         lifeBar.reset()
         listensBar.reset()
+    }
+}
+
+extension GameViewController : ListensBarDelegate {
+    func listensBarTapped() {
+        let pattern = levelPatterns[level-1]
+        AVCoordinator.shared.play(from: pattern) {
+            AVCoordinator.shared.stringToTestFor = pattern
+            self.listensBar.minusOne()
+        }
     }
 }
 

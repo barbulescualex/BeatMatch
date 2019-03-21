@@ -1,12 +1,14 @@
 import UIKit
 
 
-public enum LevelMessage : String {
+public enum EmotionMessage : String, CaseIterable {
     case NICE
     case AWESOME
     case SWEET
     case DOPE
     case EASY
+    
+    case AWE
     
     var emoji : String {
         switch self {
@@ -20,13 +22,15 @@ public enum LevelMessage : String {
             return "😈"
         case .EASY:
             return "😴"
+        case .AWE:
+            return "😢"
         }
     }
 }
 
-public class InterLevelView : UIView {
-    var message : LevelMessage!
-    public required init(message : LevelMessage) {
+public class EmotionView : UIView {
+    var message : EmotionMessage!
+    public required init(message : EmotionMessage) {
         self.message = message
         super.init(frame: .zero)
         setupView()
@@ -37,17 +41,17 @@ public class InterLevelView : UIView {
     }
     
     fileprivate func setupView(){
+        layer.zPosition = 100
         translatesAutoresizingMaskIntoConstraints = false
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.text = message.rawValue + "!" + message.emoji
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
+        label.textColor = .white
         
         addSubview(label)
-        label.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        label.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        label.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        label.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        label.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        label.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
     }
 }
