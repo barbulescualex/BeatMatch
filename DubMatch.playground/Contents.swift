@@ -1,6 +1,4 @@
 //: A UIKit based Playground for presenting user interface
-  
-import UIKit
 import PlaygroundSupport
 
-PlaygroundPage.current.liveView = GameViewController()
+PlaygroundPage.current.liveView = Game()

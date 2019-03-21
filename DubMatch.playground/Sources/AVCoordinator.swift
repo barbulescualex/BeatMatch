@@ -43,12 +43,19 @@ public final class AVCoordinator {
     
     
     //Testing
-    private var testing = false
+    public var isTesting = false {
+        didSet {
+            if !isTesting { //clear comparison strings
+                stringToTestFor = nil
+                inputPressStream = nil
+            }
+        }
+    }
     
     public var stringToTestFor : String? {
         didSet{
             guard let string = stringToTestFor else {return}
-            testing = true
+            isTesting = true
             let str = string.components(separatedBy: .whitespaces)
             stringToTestFor = str.joined()
         }
@@ -56,7 +63,7 @@ public final class AVCoordinator {
     
     private var inputPressStream : String? {
         didSet{
-            if inputPressStream != nil && testing {
+            if inputPressStream != nil && isTesting {
                 for i in 0..<inputPressStream!.count {
                     let inputIndex = inputPressStream!.index(inputPressStream!.startIndex, offsetBy: i)
                     let testingIndex = stringToTestFor!.index(stringToTestFor!.startIndex, offsetBy: i)
@@ -74,10 +81,7 @@ public final class AVCoordinator {
     }
     
     private func testingEnded(withResult result: Bool){
-        testing = false
-        stringToTestFor = nil
-        inputPressStream = nil
-        
+        isTesting = false
         if result {
              NotificationCenter.default.post(name: .passed, object: nil)
         } else {
@@ -91,7 +95,7 @@ public final class AVCoordinator {
 
 extension AVCoordinator : MidiCellDelegate {
     func pressed(_ cell: MidiCell) {
-        if !testing {return}
+        if !isTesting {return}
         guard let index = cells.firstIndex(of: cell) else {return}
         print("found index of cell from delegate")
         let char = Character(String(index))

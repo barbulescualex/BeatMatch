@@ -1,12 +1,19 @@
 import UIKit
 import AVFoundation
 
-public class GameViewController : UIViewController {
+public class Game: UIViewController {
     //MARK:- VARS
     private var engine = AVAudioEngine()
     private var level = 1 {
         didSet{
             levelLabel.text = "Level: \(level)"
+            UIView.animate(withDuration: 0.1, animations: {
+                self.levelLabel.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+            }) { (_) in
+                UIView.animate(withDuration: 0.1, animations: {
+                    self.levelLabel.transform = CGAffineTransform.identity
+                })
+            }
         }
     }
     private var levelPatterns = ["001 001 0010001","0321 0321 0303 0321","004121 444 333 13","041 041 04041 041 04"]
@@ -14,7 +21,7 @@ public class GameViewController : UIViewController {
     //MARK:- VIEW COMPONENTS
     private lazy var levelLabel : UILabel = {
         let label = UILabel()
-        label.text = "Level: 0"
+        label.text = "Level: 1"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.textColor = .white
         label.textAlignment = .left
@@ -37,6 +44,7 @@ public class GameViewController : UIViewController {
     private var midiView : MidiView!
     private var lifeBar = LifeBar()
     private var listensBar = ListensBar()
+    private var listeningLabel = ListneningLabel()
     
     public init() {
         super.init(nibName: nil, bundle: nil)
@@ -104,6 +112,13 @@ public class GameViewController : UIViewController {
         listensBar.bottomAnchor.constraint(equalTo: midiView.topAnchor, constant: -5).isActive = true
         listensBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 5).isActive = true
         listensBar.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        
+        //ListeningLabel
+        view.addSubview(listeningLabel)
+        listeningLabel.isHidden = true
+        listeningLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -5).isActive = true
+        listeningLabel.bottomAnchor.constraint(equalTo: midiView.topAnchor, constant: -5).isActive = true
+        listeningLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
     }
     
     fileprivate func setupEngine(){
@@ -119,12 +134,14 @@ public class GameViewController : UIViewController {
     
     @objc func restart(_ sender: UIButton){
         if AVCoordinator.shared.isPlaying { return }
+        AVCoordinator.shared.isTesting = false
         level = 1
         lifeBar.reset()
         listensBar.reset()
     }
     
     @objc func levelFailed(notification: NSNotification){
+        listeningLabel.isHidden = true
         print("level failed")
         lifeBar.minusOne()
         if (lifeBar.hearts == 0){//GAME OVER
@@ -147,17 +164,20 @@ public class GameViewController : UIViewController {
                 awe.alpha = 1
                 awe.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
             }) { (_) in
-                UIView.animate(withDuration: 0.1, animations: {
+                UIView.animate(withDuration: 0.2, animations: {
                     awe.transform = CGAffineTransform.identity
                 }, completion: { (_) in
                     awe.removeFromSuperview()
+                    self.startListening()
                 })
             }
-           
         }
+        
+        
     }
     
     @objc func levelPassed(notification: NSNotification){
+        listeningLabel.isHidden = true
         print("level passed")
         level = level + 1
         listensBar.reset()
@@ -182,7 +202,7 @@ public class GameViewController : UIViewController {
                 yay.alpha = 1
                 yay.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
             }) { (_) in
-                UIView.animate(withDuration: 0.1, animations: {
+                UIView.animate(withDuration: 0.2, animations: {
                     yay.transform = CGAffineTransform.identity
                 }, completion: { (_) in
                     yay.removeFromSuperview()
@@ -191,9 +211,15 @@ public class GameViewController : UIViewController {
         }
     }
     
+    fileprivate func startListening(){
+        let pattern = levelPatterns[level-1]
+        AVCoordinator.shared.stringToTestFor = pattern
+        listeningLabel.isHidden = false
+    }
+    
 }
 
-extension GameViewController : EndSceneViewDelegate {
+extension Game : EndSceneViewDelegate {
     func closeView(_ sender: EndSceneView) {
         sender.removeFromSuperview()
         level = 1
@@ -202,11 +228,16 @@ extension GameViewController : EndSceneViewDelegate {
     }
 }
 
-extension GameViewController : ListensBarDelegate {
+extension Game : ListensBarDelegate {
     func listensBarTapped() {
+        if AVCoordinator.shared.isTesting {
+            //end testing, don't lose a life
+            AVCoordinator.shared.isTesting = false
+        }
+        listeningLabel.isHidden = true
         let pattern = levelPatterns[level-1]
         AVCoordinator.shared.play(from: pattern) {
-            AVCoordinator.shared.stringToTestFor = pattern
+            self.startListening()
             self.listensBar.minusOne()
         }
     }

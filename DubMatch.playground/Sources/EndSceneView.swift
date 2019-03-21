@@ -100,6 +100,7 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.text = type.prefixEmoji + type.title + "!" + type.suffixEmoji
+        label.textColor = .lightGray
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         
