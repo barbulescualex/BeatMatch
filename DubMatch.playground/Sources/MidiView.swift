@@ -4,7 +4,7 @@ import AVFoundation
 public class MidiView : UIView {
     private var identifier = "cell"
     
-    private var sounds = [Sounds.bass,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat]
+    private var sounds = [Sounds.kick,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat,Sounds.perc]
     
     private var engine : AVAudioEngine
     private var visualizer : Visualizer?
@@ -84,7 +84,7 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return 6
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

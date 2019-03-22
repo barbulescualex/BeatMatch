@@ -38,7 +38,7 @@ public class Visualizer : UIView {
         didSet{
             uniform = [Uniform(scale: scaleValue!)]
 //            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-//            DispatchQueue.main.async {
+//            DispatchQueue.main.sync {
 //                self.metalView.setNeedsDisplay()
 //            }
         }
@@ -49,7 +49,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-        //setupMetal()
+//        setupMetal()
         setupEngineTap()
     }
     

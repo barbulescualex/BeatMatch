@@ -8,38 +8,20 @@ extension CaseIterable where AllCases.Element: Equatable {
 }
 
 public enum Sounds : String, CaseIterable {
-    case bass
+    case kick
     case snare
     case ghostSnare
     case hiHat
     case chime
-    case voice
-    
-    public enum ext : String {
-        case mp3
-        case aiff
-        case aif
-        case wav
-    }
+    case perc
     
     var fileExtension: String {
-        switch self {
-        case .bass:
-            return ext.aiff.rawValue
-        case .snare, .chime:
-            return ext.mp3.rawValue
-        case .hiHat:
-            return ext.aif.rawValue
-        case .ghostSnare:
-            return ext.wav.rawValue
-        case .voice:
-            return ext.wav.rawValue
-        }
+        return "mp3"
     }
     
     var color: UIColor {
         switch self {
-        case .bass:
+        case .kick:
             return UIColor.blue
         case .snare:
             return UIColor.purple
@@ -49,7 +31,7 @@ public enum Sounds : String, CaseIterable {
             return UIColor.orange
         case .ghostSnare:
             return UIColor.yellow
-        case .voice:
+        case .perc:
             return UIColor.red
         }
     }
