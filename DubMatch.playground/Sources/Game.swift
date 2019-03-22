@@ -16,8 +16,9 @@ public class Game: UIViewController {
             }
         }
     }
-    private var levelPatterns = ["001 001 0010001","0321 0321 0303 0321","004121 444 333 13","041 041 04041 041 04"]
-    
+    private var levelPatternsHard = ["001 001 0010001","0321 0321 0303 0321","041 041 04041 041 04","004121 444 333 13"]
+    private var levelPatternsEasy = ["1"]
+    private var levelPatternsNormal = ["0"]
     //MARK:- VIEW COMPONENTS
     private lazy var levelLabel : UILabel = {
         let label = UILabel()
@@ -162,11 +163,11 @@ public class Game: UIViewController {
             awe.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
             awe.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
             awe.alpha = 0
-            UIView.animate(withDuration: 0.25, animations: {
+            UIView.animate(withDuration: 0.5, animations: {
                 awe.alpha = 1
                 awe.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
             }) { (_) in
-                UIView.animate(withDuration: 0.2, animations: {
+                UIView.animate(withDuration: 0.5, animations: {
                     awe.transform = CGAffineTransform.identity
                 }, completion: { (_) in
                     awe.removeFromSuperview()
@@ -181,10 +182,9 @@ public class Game: UIViewController {
     @objc func levelPassed(notification: NSNotification){
         listeningLabel.isHidden = true
         print("level passed")
-        level = level + 1
         listensBar.reset()
-        if(level == levelPatterns.count){//win!
-            let win = EndSceneView(type: .over)
+        if(level == levelPatternsEasy.count){//win!
+            let win = EndSceneView(type: .win)
             win.delegate = self
             view.addSubview(win)
             win.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -200,21 +200,22 @@ public class Game: UIViewController {
             yay.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
             yay.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
             yay.alpha = 0
-            UIView.animate(withDuration: 0.25, animations: {
+            UIView.animate(withDuration: 0.5, animations: {
                 yay.alpha = 1
                 yay.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
             }) { (_) in
-                UIView.animate(withDuration: 0.2, animations: {
+                UIView.animate(withDuration: 0.5, animations: {
                     yay.transform = CGAffineTransform.identity
                 }, completion: { (_) in
                     yay.removeFromSuperview()
+                    self.level = self.level + 1
                 })
             }
         }
     }
     
     fileprivate func startListening(){
-        let pattern = levelPatterns[level-1]
+        let pattern = levelPatternsEasy[level-1]
         AVCoordinator.shared.stringToTestFor = pattern
         listeningLabel.isHidden = false
     }
@@ -237,7 +238,7 @@ extension Game : ListensBarDelegate {
             AVCoordinator.shared.isTesting = false
         }
         listeningLabel.isHidden = true
-        let pattern = levelPatterns[level-1]
+        let pattern = levelPatternsEasy[level-1]
         AVCoordinator.shared.play(from: pattern) {
             self.startListening()
             self.listensBar.minusOne()

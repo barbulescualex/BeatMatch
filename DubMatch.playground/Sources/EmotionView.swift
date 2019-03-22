@@ -1,5 +1,5 @@
 import UIKit
-
+import AVFoundation
 
 public enum EmotionMessage : String, CaseIterable {
     case NICE
@@ -51,14 +51,27 @@ public enum EmotionMessage : String, CaseIterable {
 
 public class EmotionView : UIView {
     var message : EmotionMessage!
+    var player : AVAudioPlayer?
     public required init(message : EmotionMessage) {
         self.message = message
         super.init(frame: .zero)
+        playSound()
         setupView()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    fileprivate func playSound(){
+        guard let url = Bundle.main.url(forResource: message.sound, withExtension: message.fileExtension) else {return}
+        do {
+            player = try AVAudioPlayer(contentsOf: url)
+            player?.prepareToPlay()
+            player?.play()
+        } catch {
+            print(error)
+        }
     }
     
     fileprivate func setupView(){

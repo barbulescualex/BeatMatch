@@ -144,12 +144,10 @@ public final class AVCoordinator {
         var magnitude = [Float](repeating: 0, count: 1024)
         vDSP_zvmags(&output, 1, &magnitude, 1, 1024) //a^2 + b^2
         
-        print(magnitude)
         var normalizingFactor : Float = 1.0/(2*2048)
         //normalizing
         var normalizedMagnitude = [Float](repeating: 0, count: 1024)
         vDSP_vsmul(&magnitude, 1, &normalizingFactor, &normalizedMagnitude, 1, 1024)
-        print(normalizedMagnitude)
         
         visualizer?.lineMagnitudes = normalizedMagnitude
         
@@ -167,8 +165,6 @@ public final class AVCoordinator {
         
         if (val > 0.5) {val = 0.5}
         values.append(val)
-        
-        print(Thread.current, "In RMS")
         
         //interpolation
         if values.count >= 2  {
@@ -197,7 +193,6 @@ public final class AVCoordinator {
             visualizer?.scaleValue = four5
             visualizer?.scaleValue = five
         }
-        print(val, "VAL")
         visualizer?.scaleValue = val
     }
 }

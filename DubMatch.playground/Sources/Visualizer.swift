@@ -45,21 +45,19 @@ public class Visualizer : UIView {
     
     var scaleValue : Float? {
         didSet{
-            print(Thread.current, "Scale didSet")
             uniform = [Uniform(scale: scaleValue!)]
-            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-            lineUniforms = []
-            for mag in lineMagnitudes! {
-                lineUniforms.append(LineUniform(scale: 1 + mag))
-            }
-            lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
-            metalView.draw()
+//            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
+//            lineUniforms = []
+//            metalView.draw()
         }
     }
     
     var lineMagnitudes : [Float]? {
         didSet{
-            
+            for mag in lineMagnitudes! {
+                lineUniforms.append(LineUniform(scale: 1 + mag))
+            }
+//            lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
         }
     }
     
@@ -68,7 +66,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-        setupMetal()
+//        setupMetal()
         setupEngineTap()
     }
     
@@ -80,8 +78,6 @@ public class Visualizer : UIView {
         func degreesToRads(forValue x: Float)->Float32{
             return (Float.pi*x)/180
         }
-//        lineVertices.append(VertexIn(pos: [0,0]))//first 2 value ignored for lines
-//        lineVertices.append(VertexIn(pos: [0,0]))
         for i in 0..<720 {
             let position : simd_float2 = [cos(degreesToRads(forValue: Float(i)))*1,sin(degreesToRads(forValue: Float(i)))*1]
             if (i+1)%2 == 0 {
@@ -139,7 +135,6 @@ public class Visualizer : UIView {
     
     public func setupEngineTap(){
         engine.mainMixerNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, time) in
-            print(Thread.current, "In TAP")
             AVCoordinator.shared.buffer = buffer
         }
     }

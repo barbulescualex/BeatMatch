@@ -1,4 +1,5 @@
 import UIKit
+import AVFoundation
 
 public enum EndMessage {
     case over
@@ -30,6 +31,19 @@ public enum EndMessage {
             return "😢"
         }
     }
+    
+    var sound : String {
+        switch self {
+        case .win:
+            return "win"
+        case .over:
+            return "over"
+        }
+    }
+    
+    var fileExtension : String {
+        return "mp3"
+    }
 }
 
 protocol EndSceneViewDelegate : AnyObject {
@@ -40,6 +54,8 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
     var type : EndMessage!
     
     weak var delegate : EndSceneViewDelegate?
+    
+    var player : AVAudioPlayer?
     
     let backgroundView : UIView = {
         let view = UIView()
@@ -60,6 +76,7 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
     public required init(type : EndMessage) {
         self.type = type
         super.init(frame: .zero)
+        playSound()
         setupView()
     }
     
@@ -70,6 +87,17 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
     public override func didMoveToSuperview() {
         super.didMoveToSuperview()
         showAnimate()
+    }
+    
+    fileprivate func playSound(){
+        guard let url = Bundle.main.url(forResource: type.sound, withExtension: type.fileExtension) else {return}
+        do {
+            player = try AVAudioPlayer(contentsOf: url)
+            player?.prepareToPlay()
+            player?.play()
+        } catch {
+            print(error)
+        }
     }
     
     fileprivate func setupView(){
@@ -104,9 +132,29 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         
+        //content label
+        let content = UILabel()
+        content.font = UIFont.systemFont(ofSize: 20)
+        content.textColor = .lightGray
+        content.translatesAutoresizingMaskIntoConstraints = false
+        content.textAlignment = .center
+        content.numberOfLines = 0
+        if type == .over {
+            content.text = "Try again!😜 You can always make the game easier😉, just go into your playground and change the input parameters for the Game object!😎"
+        } else {
+            content.text = "Congratulations, see you at WWDC 2019!👋🏻☺️"
+        }
+        
         viewArea.addSubview(label)
         label.centerXAnchor.constraint(equalTo: viewArea.centerXAnchor).isActive = true
-        label.centerYAnchor.constraint(equalTo: viewArea.centerYAnchor).isActive = true
+        label.topAnchor.constraint(equalTo: viewArea.topAnchor, constant: 5).isActive = true
+        label.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        
+        viewArea.addSubview(content)
+        content.topAnchor.constraint(equalTo: label.bottomAnchor).isActive = true
+        content.trailingAnchor.constraint(equalTo: viewArea.trailingAnchor, constant: 5).isActive = true
+        content.leadingAnchor.constraint(equalTo: viewArea.leadingAnchor, constant: -5).isActive = true
+        content.bottomAnchor.constraint(equalTo: viewArea.bottomAnchor, constant: -5).isActive = true
     }
     
     @objc func outsidePressed(_ sender: UIGestureRecognizer){
