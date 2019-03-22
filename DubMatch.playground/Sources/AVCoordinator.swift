@@ -177,22 +177,25 @@ public final class AVCoordinator {
             
             let three = (current + previous)/2
             let two = (three + previous)/2
+            let two5 = (two + three)/2
             let one = (two + previous)/2
-//            let zero5 = (previous + one)/2
-//            let one5 = (one + 2)/2
+            let zero5 = (previous + one)/2
+            let one5 = (one + two)/2
             let four = (three + current)/2
+            let three5 = (three + four)/2
             let five = (four + current)/2
+            let four5 = (four + five)/2
             
+            visualizer?.scaleValue = zero5
             visualizer?.scaleValue = one
-            print(one)
+            visualizer?.scaleValue = one5
             visualizer?.scaleValue = two
-            print(two)
+            visualizer?.scaleValue = two5
             visualizer?.scaleValue = three
-            print(three)
+            visualizer?.scaleValue = three5
             visualizer?.scaleValue = four
-            print(four)
+            visualizer?.scaleValue = four5
             visualizer?.scaleValue = five
-            print(five)
         }
         print(val, "VAL")
         visualizer?.scaleValue = val

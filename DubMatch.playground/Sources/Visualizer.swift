@@ -79,6 +79,7 @@ public class Visualizer : UIView {
         func degreesToRads(forValue x: Float)->Float32{
             return (Float.pi*x)/180
         }
+        //lineVertices.append(VertexIn(pos: [0,0]))//first value ignored for lines
         for i in 0..<720 {
             let position : simd_float2 = [cos(degreesToRads(forValue: Float(i)))*1,sin(degreesToRads(forValue: Float(i)))*1]
             if (i+1)%2 == 0 {
@@ -159,7 +160,7 @@ extension Visualizer : MTKViewDelegate {
         renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
         renderEncoder.setVertexBuffer(lineBuffer, offset: 0, index: 2)
         renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 1080)
-        renderEncoder.drawPrimitives(type: .line , vertexStart: 1080, vertexCount: 1440)
+        renderEncoder.drawPrimitives(type: .lineStrip , vertexStart: 1080, vertexCount: 1440)
 
         renderEncoder.endEncoding()
         commandBuffer.present(view.currentDrawable!)
