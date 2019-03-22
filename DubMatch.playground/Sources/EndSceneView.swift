@@ -51,11 +51,13 @@ protocol EndSceneViewDelegate : AnyObject {
 }
 
 public class EndSceneView : UIView, UIGestureRecognizerDelegate {
-    var type : EndMessage!
+    private var type : EndMessage!
     
     weak var delegate : EndSceneViewDelegate?
     
-    var player : AVAudioPlayer?
+    private var player : AVAudioPlayer?
+    
+    private var canExit = true
     
     let backgroundView : UIView = {
         let view = UIView()
@@ -95,6 +97,10 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
             player = try AVAudioPlayer(contentsOf: url)
             player?.prepareToPlay()
             player?.play()
+            canExit = false
+            DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+                self.canExit = true
+            }
         } catch {
             print(error)
         }
@@ -158,7 +164,9 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
     }
     
     @objc func outsidePressed(_ sender: UIGestureRecognizer){
-        leaveAnimate()
+        if canExit {
+            leaveAnimate()
+        }
     }
     
     //Animations

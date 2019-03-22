@@ -52,6 +52,8 @@ public enum EmotionMessage : String, CaseIterable {
 public class EmotionView : UIView {
     var message : EmotionMessage!
     var player : AVAudioPlayer?
+    
+    
     public required init(message : EmotionMessage) {
         self.message = message
         super.init(frame: .zero)
