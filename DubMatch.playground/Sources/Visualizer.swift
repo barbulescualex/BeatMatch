@@ -36,6 +36,7 @@ public class Visualizer : UIView {
     
     var scaleValue : Float? {
         didSet{
+            print(Thread.current, "Scale didSet")
             uniform = [Uniform(scale: scaleValue!)]
             uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
             metalView.draw()
@@ -59,7 +60,7 @@ public class Visualizer : UIView {
         func degreesToRads(forValue x: Float)->Float32{
             return (Float.pi*x)/180
         }
-        for i in 0..<720 {
+        for i in 0..<1080 {
             let position : simd_float2 = [cos(degreesToRads(forValue: Float(i)))*1,sin(degreesToRads(forValue: Float(i)))*1]
             if (i+1)%2 == 0 {
                 vertices.append(originVertice)
