@@ -7,6 +7,7 @@ public final class AVCoordinator {
     static let shared = AVCoordinator()
     public var cells : [MidiCell] = []
     
+    
     //Playing
     public var isPlaying = false
     
@@ -96,15 +97,23 @@ public final class AVCoordinator {
     private var normalSet = false
     private var values : [Float] = [0.3]
     
-    public func rms(from buffer: AVAudioPCMBuffer, with bufferSize: UInt, cell: MidiCell?){
-        guard let channelData = buffer.floatChannelData?[0] else {return}
+    
+    public var buffer : AVAudioPCMBuffer? {
+        didSet{
+            let thread = Thread(target: self, selector: #selector(compute), object: nil)
+            thread.start()
+        }
+    }
+    
+    @objc func compute(){
+        guard let channelData = buffer?.floatChannelData?[0] else {return}
         var val = Float(0);
         
-        vDSP_vsq(channelData, 1, channelData, 1, bufferSize/2) //square
-        vDSP_meanv(channelData, 1, &val, bufferSize/2) //mean
+        vDSP_vsq(channelData, 1, channelData, 1, 1024) //square
+        vDSP_meanv(channelData, 1, &val, 1024) //mean
         
         //check for done state
-        if val == 0{ //makes sure it always ends up on 0.3 scale size
+        if val < 0.00009 { //makes sure it always ends up on 0.3 scale size
             if normalSet {
                 values = [0.3]
                 return
@@ -129,6 +138,8 @@ public final class AVCoordinator {
         
         if (val > 0.5) {val = 0.5}
         values.append(val)
+        
+        print(Thread.current, "In RMS")
         
         //interpolation
         if values.count >= 2  {

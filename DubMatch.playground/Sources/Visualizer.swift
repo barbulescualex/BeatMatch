@@ -38,9 +38,7 @@ public class Visualizer : UIView {
         didSet{
             uniform = [Uniform(scale: scaleValue!)]
             uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-            DispatchQueue.main.async {
-                self.metalView.setNeedsDisplay()
-            }
+            metalView.draw()
         }
     }
     
@@ -111,7 +109,8 @@ public class Visualizer : UIView {
     
     public func setupEngineTap(){
         engine.mainMixerNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, time) in
-            AVCoordinator.shared.rms(from: buffer, with: 1024, cell: nil)
+            print(Thread.current, "In TAP")
+            AVCoordinator.shared.buffer = buffer
         }
     }
 
