@@ -9,7 +9,7 @@ let vertexInStruct = "struct VertexIn {vector_float2 pos;};"
 let vertexOutStruct = "struct VertexOut{float4 color; float4 pos [[position]];};"
 let uniformStruct = "struct Uniform{float scale;};"
 let uniformLineStruct = "struct LineUniform { float scale; };"
-let vertexShader = "vertex VertexOut vertexShader(const device VertexIn *vertexArray [[buffer(0)]],const device Uniform *uniformArray [[buffer(1)]], const device LineUniform *lineArray [[buffer(2)]], unsigned int vid [[vertex_id]]){VertexIn in = vertexArray[vid];VertexOut out; float scale = uniformArray[0].scale; if(vid<=1080){out.color = float4(1,1,1,1); float x = in.pos.x*scale; float y = in.pos.y*scale; out.pos = float4(x,y,0,1);}else{float x = in.pos.x*scale; float y = in.pos.y*scale; if(vid%2==0){out.color = float4(1,0,0,1);out.pos = float4(x,y,0,1);}else{unsigned int lid = (vid-1081)/2; LineUniform lineIn = lineArray[lid]; out.color = float4(0,0,1,1); out.pos = float4(x*lineIn.scale, y*lineIn.scale,0,1);};}; return out;};"
+let vertexShader = "vertex VertexOut vertexShader(const device VertexIn *vertexArray [[buffer(0)]],const device Uniform *uniformArray [[buffer(1)]], const device LineUniform *lineArray [[buffer(2)]], unsigned int vid [[vertex_id]]){VertexIn in = vertexArray[vid];VertexOut out; float scale = uniformArray[0].scale; if(vid<1080){out.color = float4(1,1,1,1); float x = in.pos.x*scale; float y = in.pos.y*scale; out.pos = float4(x,y,0,1);}else{float x = in.pos.x*scale; float y = in.pos.y*scale; if(vid%2==0){out.color = float4(1,0,0,1);out.pos = float4(x,y,0,1);}else{unsigned int lid = (vid-1081)/2; LineUniform lineIn = lineArray[lid]; out.color = float4(0,0,1,1); out.pos = float4(x*lineIn.scale, y*lineIn.scale,0,1);};}; return out;};"
 let fragmentShader = "fragment float4 fragmentShader(VertexOut interpolated [[stage_in]]){return interpolated.color;};"
 
 public class Visualizer : UIView {
@@ -48,17 +48,18 @@ public class Visualizer : UIView {
             print(Thread.current, "Scale didSet")
             uniform = [Uniform(scale: scaleValue!)]
             uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
+            lineUniforms = []
+            for mag in lineMagnitudes! {
+                lineUniforms.append(LineUniform(scale: 1 + mag))
+            }
+            lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
             metalView.draw()
         }
     }
     
     var lineMagnitudes : [Float]? {
         didSet{
-            lineUniforms = []
-            for mag in lineMagnitudes! {
-                lineUniforms.append(LineUniform(scale: 1 + mag))
-            }
-            lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
+            
         }
     }
     
@@ -79,7 +80,8 @@ public class Visualizer : UIView {
         func degreesToRads(forValue x: Float)->Float32{
             return (Float.pi*x)/180
         }
-        //lineVertices.append(VertexIn(pos: [0,0]))//first value ignored for lines
+//        lineVertices.append(VertexIn(pos: [0,0]))//first 2 value ignored for lines
+//        lineVertices.append(VertexIn(pos: [0,0]))
         for i in 0..<720 {
             let position : simd_float2 = [cos(degreesToRads(forValue: Float(i)))*1,sin(degreesToRads(forValue: Float(i)))*1]
             if (i+1)%2 == 0 {
