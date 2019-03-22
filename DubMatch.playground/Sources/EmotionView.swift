@@ -26,6 +26,27 @@ public enum EmotionMessage : String, CaseIterable {
             return "😢"
         }
     }
+    
+    var sound : String {
+        switch self {
+        case .NICE:
+            return "nice"
+        case .AWESOME:
+            return "awesome"
+        case .SWEET:
+            return "sweet"
+        case .DOPE:
+            return "dope"
+        case .EASY:
+            return "easy"
+        case .AWE:
+            return "awe"
+        }
+    }
+    
+    var fileExtension: String {
+        return "mp3"
+    }
 }
 
 public class EmotionView : UIView {

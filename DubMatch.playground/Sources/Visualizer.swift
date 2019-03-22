@@ -52,6 +52,16 @@ public class Visualizer : UIView {
         }
     }
     
+    var lineMagnitudes : [Float]? {
+        didSet{
+            lineUniforms = []
+            for mag in lineMagnitudes! {
+                lineUniforms.append(LineUniform(scale: 1 + mag))
+            }
+            lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
+        }
+    }
+    
     public required init(engine: AVAudioEngine) {
         self.engine = engine
         super.init(frame: .zero)
@@ -80,10 +90,7 @@ public class Visualizer : UIView {
             lineVertices.append(vertice)
             lineVertices.append(vertice)
             
-            //fake line scales
-            var num = Float.random(in: 0.001...0.2)
-            num = num + 1
-            lineUniforms.append(LineUniform(scale: num))
+            lineUniforms.append(LineUniform(scale: 1))
         }
         vertices = vertices + lineVertices
     }
