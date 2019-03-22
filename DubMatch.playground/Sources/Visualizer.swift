@@ -5,10 +5,11 @@ import simd
 import Accelerate
 
 let top = "#include <metal_stdlib>\n"+"#include <simd/simd.h>\n"+"using namespace metal;"
-let vertexStruct = "struct VertexIn {vector_float2 pos;};"
+let vertexInStruct = "struct VertexIn {vector_float2 pos;};"
 let vertexOutStruct = "struct VertexOut{float4 color; float4 pos [[position]];};"
 let uniformStruct = "struct Uniform{float scale;};"
-let vertexShader = "vertex VertexOut vertexShader(const device VertexIn *vertexArray [[buffer(0)]],const device Uniform *uniformArray [[buffer(1)]], unsigned int vid [[vertex_id]]){VertexIn in = vertexArray[vid];VertexOut out;out.color = float4(1,1,1,1); float scale = uniformArray[0].scale; float x = in.pos.x * scale; float y = in.pos.y * scale; out.pos = float4(x, y, 0, 1);return out;};"
+let uniformLineStruct = "struct LineUniform { float scale; };"
+let vertexShader = "vertex VertexOut vertexShader(const device VertexIn *vertexArray [[buffer(0)]],const device Uniform *uniformArray [[buffer(1)]], const device LineUniform *lineArray [[buffer(2)]], unsigned int vid [[vertex_id]]){VertexIn in = vertexArray[vid];VertexOut out; float scale = uniformArray[0].scale; if(vid<=1080){out.color = float4(1,1,1,1); float x = in.pos.x*scale; float y = in.pos.y*scale; out.pos = float4(x,y,0,1);}else{float x = in.pos.x*scale; float y = in.pos.y*scale; if(vid%2==0){out.color = float4(1,0,0,1);out.pos = float4(x,y,0,1);}else{unsigned int lid = (vid-1081)/2; LineUniform lineIn = lineArray[lid]; out.color = float4(0,0,1,1); out.pos = float4(x*lineIn.scale, y*lineIn.scale,0,1);};}; return out;};"
 let fragmentShader = "fragment float4 fragmentShader(VertexOut interpolated [[stage_in]]){return interpolated.color;};"
 
 public class Visualizer : UIView {
@@ -20,6 +21,7 @@ public class Visualizer : UIView {
     private var pipelineState: MTLRenderPipelineState!
     private var vertexBuffer: MTLBuffer!
     private var uniformBuffer: MTLBuffer!
+    private var lineBuffer: MTLBuffer!
     
     struct VertexIn {
         var pos : simd_float2
@@ -29,18 +31,24 @@ public class Visualizer : UIView {
         var scale : Float
     }
     
+    struct LineUniform {
+        var scale : Float
+    }
+    
     var uniform : [Uniform] = [Uniform(scale: 0.3)]
     var vertices : [VertexIn] = []
-    var lineVertices : [VertexIn] = []
 
     let originVertice = VertexIn(pos: [0,0])
+    
+    var lineVertices : [VertexIn] = []
+    var lineUniforms : [LineUniform] = []
     
     var scaleValue : Float? {
         didSet{
             print(Thread.current, "Scale didSet")
             uniform = [Uniform(scale: scaleValue!)]
-//            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-//            metalView.draw()
+            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
+            metalView.draw()
         }
     }
     
@@ -49,7 +57,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-        //setupMetal()
+        setupMetal()
         setupEngineTap()
     }
     
@@ -61,7 +69,7 @@ public class Visualizer : UIView {
         func degreesToRads(forValue x: Float)->Float32{
             return (Float.pi*x)/180
         }
-        for i in 0..<1080 {
+        for i in 0..<720 {
             let position : simd_float2 = [cos(degreesToRads(forValue: Float(i)))*1,sin(degreesToRads(forValue: Float(i)))*1]
             if (i+1)%2 == 0 {
                 vertices.append(originVertice)
@@ -71,7 +79,13 @@ public class Visualizer : UIView {
             vertices.append(vertice)
             lineVertices.append(vertice)
             lineVertices.append(vertice)
+            
+            //fake line scales
+            var num = Float.random(in: 0.001...0.2)
+            num = num + 1
+            lineUniforms.append(LineUniform(scale: num))
         }
+        vertices = vertices + lineVertices
     }
     
     fileprivate func setupView(){
@@ -110,6 +124,7 @@ public class Visualizer : UIView {
         //metal buffer
         vertexBuffer = metalDevice.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<VertexIn>.stride, options: [])!
         uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
+        lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
     }
     
     public func setupEngineTap(){
@@ -135,7 +150,9 @@ extension Visualizer : MTKViewDelegate {
         renderEncoder.setRenderPipelineState(pipelineState)
         renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
         renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: 1)
-        renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: vertices.count)
+        renderEncoder.setVertexBuffer(lineBuffer, offset: 0, index: 2)
+        renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 1080)
+        renderEncoder.drawPrimitives(type: .line , vertexStart: 1080, vertexCount: 1440)
 
         renderEncoder.endEncoding()
         commandBuffer.present(view.currentDrawable!)
@@ -144,7 +161,7 @@ extension Visualizer : MTKViewDelegate {
     
     func buildRenderPipelineWith(device: MTLDevice, metalKitView: MTKView) throws -> MTLRenderPipelineState {
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        let shader = top + vertexStruct + uniformStruct + vertexOutStruct + vertexShader + fragmentShader
+        let shader = top + vertexInStruct + uniformStruct + uniformLineStruct + vertexOutStruct + vertexShader + fragmentShader
         let library = try! device.makeLibrary(source: shader, options: nil)
         pipelineDescriptor.vertexFunction = library.makeFunction(name: "vertexShader")
         pipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragmentShader")
