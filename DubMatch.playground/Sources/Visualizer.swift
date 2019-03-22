@@ -5,10 +5,10 @@ import simd
 import Accelerate
 
 let top = "#include <metal_stdlib>\n"+"#include <simd/simd.h>\n"+"using namespace metal;"
-let vertexStruct = "struct Vertex {vector_float4 color; vector_float2 pos;};"
+let vertexStruct = "struct VertexIn {vector_float2 pos;};"
 let vertexOutStruct = "struct VertexOut{float4 color; float4 pos [[position]];};"
 let uniformStruct = "struct Uniform{float scale;};"
-let vertexShader = "vertex VertexOut vertexShader(const device Vertex *vertexArray [[buffer(0)]],const device Uniform *uniformArray [[buffer(1)]], unsigned int vid [[vertex_id]]){Vertex in = vertexArray[vid];VertexOut out;out.color = in.color; float scale = uniformArray[0].scale; float x = in.pos.x * scale; float y = in.pos.y * scale; out.pos = float4(x, y, 0, 1);return out;};"
+let vertexShader = "vertex VertexOut vertexShader(const device VertexIn *vertexArray [[buffer(0)]],const device Uniform *uniformArray [[buffer(1)]], unsigned int vid [[vertex_id]]){VertexIn in = vertexArray[vid];VertexOut out;out.color = float4(1,1,1,1); float scale = uniformArray[0].scale; float x = in.pos.x * scale; float y = in.pos.y * scale; out.pos = float4(x, y, 0, 1);return out;};"
 let fragmentShader = "fragment float4 fragmentShader(VertexOut interpolated [[stage_in]]){return interpolated.color;};"
 
 public class Visualizer : UIView {
@@ -21,8 +21,7 @@ public class Visualizer : UIView {
     private var vertexBuffer: MTLBuffer!
     private var uniformBuffer: MTLBuffer!
     
-    struct Vertex {
-        var color : simd_float4
+    struct VertexIn {
         var pos : simd_float2
     }
     
@@ -31,8 +30,10 @@ public class Visualizer : UIView {
     }
     
     var uniform : [Uniform] = [Uniform(scale: 0.3)]
-    var vertices : [Vertex] = []
-    let originVertice = Vertex(color: [1,1,1,1], pos: [0,0])
+    var vertices : [VertexIn] = []
+    var lineVertices : [VertexIn] = []
+
+    let originVertice = VertexIn(pos: [0,0])
     
     var scaleValue : Float? {
         didSet{
@@ -65,8 +66,11 @@ public class Visualizer : UIView {
             if (i+1)%2 == 0 {
                 vertices.append(originVertice)
             }
-            let vertice = Vertex(color: [1,1,1,1], pos: position)
+            
+            let vertice = VertexIn(pos: position)
             vertices.append(vertice)
+            lineVertices.append(vertice)
+            lineVertices.append(vertice)
         }
     }
     
@@ -104,7 +108,7 @@ public class Visualizer : UIView {
         }
 
         //metal buffer
-        vertexBuffer = metalDevice.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<Vertex>.stride, options: [])!
+        vertexBuffer = metalDevice.makeBuffer(bytes: vertices, length: vertices.count * MemoryLayout<VertexIn>.stride, options: [])!
         uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
     }
     
