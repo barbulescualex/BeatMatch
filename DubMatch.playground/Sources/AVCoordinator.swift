@@ -102,9 +102,13 @@ public final class AVCoordinator {
         
         vDSP_vsq(channelData, 1, channelData, 1, bufferSize) //square
         vDSP_meanv(channelData, 1, &val, bufferSize) //mean
+        
+        //only care about first 2 digits
+//        if val < 0.05 && val != 0 {
+//            val = val*10
+//        }
         val = val + 0.3
         if val == 0.3{ //makes sure it always ends up on 0.3 scale size
-            cell?.cellIsPlaying = false
             if normalSet {
                 values = [0.3]
                 return
@@ -114,24 +118,31 @@ public final class AVCoordinator {
         } else {
             normalSet = false
         }
+        
         if (val > 0.5) {val = 0.5}
         values.append(val)
-        if values.count >= 2 {
+        
+        //interpolation
+        if values.count >= 2 && !normalSet {
             let current = val
             let previous = values[values.count-2]
             
-            let inbetween = (current + previous)/2
-            let lowbetween = (inbetween + previous)/2
-            let highbetween = (inbetween + current)/2
+            let three = (current + previous)/2
+            let two = (three + previous)/2
+            let one = (two + previous)/2
+            let four = (three + current)/2
+            let five = (four + current)/2
             
-            visualizer?.scaleValue = lowbetween
-            print(lowbetween," Low")
-            
-            visualizer?.scaleValue = inbetween
-            print(inbetween, " In")
-            
-            visualizer?.scaleValue = highbetween
-            print(highbetween, " High")
+            visualizer?.scaleValue = one
+            print(one)
+            visualizer?.scaleValue = two
+            print(two)
+            visualizer?.scaleValue = three
+            print(three)
+            visualizer?.scaleValue = four
+            print(four)
+            visualizer?.scaleValue = five
+            print(five)
         }
         print(val, "VAL")
         visualizer?.scaleValue = val
