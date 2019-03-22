@@ -100,15 +100,11 @@ public final class AVCoordinator {
         guard let channelData = buffer.floatChannelData?[0] else {return}
         var val = Float(0);
         
-        vDSP_vsq(channelData, 1, channelData, 1, bufferSize) //square
-        vDSP_meanv(channelData, 1, &val, bufferSize) //mean
+        vDSP_vsq(channelData, 1, channelData, 1, bufferSize/2) //square
+        vDSP_meanv(channelData, 1, &val, bufferSize/2) //mean
         
-        //only care about first 2 digits
-//        if val < 0.05 && val != 0 {
-//            val = val*10
-//        }
-        val = val + 0.3
-        if val == 0.3{ //makes sure it always ends up on 0.3 scale size
+        //check for done state
+        if val == 0{ //makes sure it always ends up on 0.3 scale size
             if normalSet {
                 values = [0.3]
                 return
@@ -119,11 +115,23 @@ public final class AVCoordinator {
             normalSet = false
         }
         
+        //Adjust values to 2 decimal places
+        if val < 0.0009 {
+            val = val*100
+        } else if val < 0.009 {
+            val = val*10
+        }
+        if val < 0.05 && !normalSet {
+            val = 0.05
+        }
+        
+        val = val + 0.3
+        
         if (val > 0.5) {val = 0.5}
         values.append(val)
         
         //interpolation
-        if values.count >= 2 && !normalSet {
+        if values.count >= 2  {
             let current = val
             let previous = values[values.count-2]
             
