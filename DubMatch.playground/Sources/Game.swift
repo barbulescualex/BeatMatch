@@ -48,15 +48,15 @@ public class Game: UIViewController {
     
     //Game vars
     private var difficulty : Difficulty!
-    private var lives = 5
-    private var listens = 3
+    private var lives = 10
+    private var listens = 5
     
     public init(withDifficulty difficulty: Difficulty, withLives lives: Int?, withListensPerLevel listens: Int?) {
         self.difficulty = difficulty
-        if let lives = lives {
+        if let lives = lives, !(lives >= 10) {
             self.lives = lives
         }
-        if let listens = listens {
+        if let listens = listens, !(listens !>= 5) {
             self.listens = listens
         }
         self.levelPatterns = difficulty.pattern
