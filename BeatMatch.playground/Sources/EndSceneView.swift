@@ -51,17 +51,17 @@ protocol EndSceneViewDelegate : AnyObject {
 }
 
 public class EndSceneView : UIView, UIGestureRecognizerDelegate {
+    //MARK:- Vars
     private var type : EndMessage!
+    private var player : AVAudioPlayer?
+    private var canExit = true
     
     weak var delegate : EndSceneViewDelegate?
     
-    private var player : AVAudioPlayer?
     
-    private var canExit = true
-    
+    //MARK:- View Components
     let backgroundView : UIView = {
         let view = UIView()
-        //view.backgroundColor = UIColor.white.withAlphaComponent(0.4)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.isUserInteractionEnabled = true
         return view
@@ -69,7 +69,6 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
     
     let viewArea : UIView =  {
         let view = UIView()
-        //view.backgroundColor = .white
         view.layer.cornerRadius = 10
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -91,6 +90,7 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         showAnimate()
     }
     
+    //MARK:- Functions
     fileprivate func playSound(){
         guard let url = Bundle.main.url(forResource: type.sound, withExtension: type.fileExtension) else {return}
         do {
@@ -194,7 +194,7 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    //Animations
+    //MARK:- Animations
     func showAnimate(){
         viewArea.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         viewArea.alpha = 0.0
@@ -212,7 +212,6 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
     }
     
     func leaveAnimate(){
-        //viewArea.translatesAutoresizingMaskIntoConstraints = true
         UIView.animate(withDuration: 0.1, animations: {
             self.viewArea.frame = CGRect(x: 0, y: 2000, width: self.viewArea.frame.size.width, height: self.viewArea.frame.size.height)
             self.backgroundView.backgroundColor = .clear

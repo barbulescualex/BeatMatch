@@ -45,8 +45,9 @@ public enum EmotionMessage : String, CaseIterable {
 }
 
 public class EmotionView : UIView {
-    var message : EmotionMessage!
-    var player : AVAudioPlayer?
+    //MARK:- VARS
+    private var message : EmotionMessage!
+    private var player : AVAudioPlayer?
     
     
     public required init(message : EmotionMessage) {
@@ -60,6 +61,7 @@ public class EmotionView : UIView {
         fatalError()
     }
     
+    //MARK:- Functions
     fileprivate func playSound(){
         guard let url = Bundle.main.url(forResource: message.sound, withExtension: message.fileExtension) else {return}
         do {
@@ -74,6 +76,7 @@ public class EmotionView : UIView {
     fileprivate func setupView(){
         layer.zPosition = 100
         translatesAutoresizingMaskIntoConstraints = false
+        
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.text = message.rawValue + "!" + message.emoji

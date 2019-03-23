@@ -2,14 +2,14 @@ import UIKit
 import AVFoundation
 
 public class MidiView : UIView {
+    //MARK:- Vars
     private var identifier = "cell"
-    
     private var sounds = [Sounds.kick,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat,Sounds.perc]
-    
     private var engine : AVAudioEngine
     private var visualizer : Visualizer?
     private var cellSwapped = (false,0,0) //Flag for our AVCoordinator to swap cell from index to index
     
+    //MARK:- View Components
     private lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 1
@@ -27,6 +27,7 @@ public class MidiView : UIView {
         return collectionView
     }()
     
+    //MARK:- Setup
     public required init(engine: AVAudioEngine, vis: Visualizer) {
         self.engine = engine
         self.visualizer = vis
@@ -56,7 +57,10 @@ public class MidiView : UIView {
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleMoveGesture(_:)))
         collectionView.addGestureRecognizer(longPress)
     }
-    
+}
+
+extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    //MARK:- Collection View
     @objc func handleMoveGesture(_ sender : UILongPressGestureRecognizer){
         if AVCoordinator.shared.isPlaying { return }//no interaction with midi pad while sounds playing
         switch(sender.state) {
@@ -72,11 +76,8 @@ public class MidiView : UIView {
         default:
             collectionView.cancelInteractiveMovement()
         }
-
+        
     }
-}
-
-extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     //population
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -92,7 +93,6 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as! MidiCell
         cell.sound = sounds[indexPath.item]
         cell.engine = engine
-        cell.visualizer = visualizer
         cell.delegate = AVCoordinator.shared
         if !cellSwapped.0 {
             AVCoordinator.shared.cells.append(cell)

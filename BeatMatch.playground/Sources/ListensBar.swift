@@ -5,12 +5,18 @@ protocol ListensBarDelegate : AnyObject {
 }
 
 public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
+    //MARK:- Vars
     private var listens = 3
     private var maxListens = 3
     private var labels = [UILabel]()
     
+    private var speakers = ["🔈","🔉","🔊"]
+    private var speakerIndex = 0
+    public var timer : Timer?
+    
     weak var delegate : ListensBarDelegate?
     
+    //MARK:- Setup
     public required init(listens: Int) {
         self.listens = listens
         self.maxListens = listens
@@ -38,11 +44,13 @@ public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
         addGestureRecognizer(tap)
     }
     
+    //MARK:- Functions
     public func minusOne(){
         UIView.animate(withDuration: 0.2) {
             self.labels[self.listens-1].isHidden = true
         }
         listens = listens - 1
+        timer?.invalidate()
     }
     
     public func reset(){
@@ -64,7 +72,22 @@ public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
     @objc func tapped(_ sender: UIGestureRecognizer){
         if listens != 0 && !AVCoordinator.shared.isPlaying{
               delegate?.listensBarTapped()
+            setupTimerForSpeakers()
         }
+    }
+    
+    fileprivate func setupTimerForSpeakers(){
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(exactly: 0.2)!, repeats: true, block: { [weak self](t) in
+            if self == nil {
+                return
+            }
+            if self!.speakerIndex == 2 {
+                self!.speakerIndex = 0
+            }
+            self!.labels[self!.listens-1].text = self!.speakers[self!.speakerIndex]
+            self!.speakerIndex = self!.speakerIndex + 1
+        })
     }
 }
 

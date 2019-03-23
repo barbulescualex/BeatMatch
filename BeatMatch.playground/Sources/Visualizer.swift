@@ -4,25 +4,21 @@ import MetalKit
 import simd
 import Accelerate
 
-let top = "#include <metal_stdlib>\n"+"#include <simd/simd.h>\n"+"using namespace metal;"
-let vertexInStruct = "struct VertexIn {vector_float2 pos;};"
-let vertexOutStruct = "struct VertexOut{float4 color; float4 pos [[position]];};"
-let uniformStruct = "struct Uniform{float scale;};"
-let uniformLineStruct = "struct LineUniform { float scale; };"
-let vertexShader = "vertex VertexOut vertexShader(const device VertexIn *vertexArray [[buffer(0)]],const device Uniform *uniformArray [[buffer(1)]], const device LineUniform *lineArray [[buffer(2)]], unsigned int vid [[vertex_id]]){VertexIn in = vertexArray[vid];VertexOut out; float scale = uniformArray[0].scale; if(vid<1080){out.color = float4(1,1,1,1); float x = in.pos.x*scale; float y = in.pos.y*scale; out.pos = float4(x,y,0,1);}else{float x = in.pos.x*scale; float y = in.pos.y*scale; if(vid%2==0){out.color = float4(1,0,0,1);out.pos = float4(x,y,0,1);}else{unsigned int lid = (vid-1081)/2; LineUniform lineIn = lineArray[lid]; out.color = float4(0,0,1,1); out.pos = float4(x*lineIn.scale, y*lineIn.scale,0,1);};}; return out;};"
-let fragmentShader = "fragment float4 fragmentShader(VertexOut interpolated [[stage_in]]){return interpolated.color;};"
-
 public class Visualizer : UIView {
+    //MARK:- Vars
     private var engine : AVAudioEngine
     
+    //MARK:- Metal Vars
     private var metalView : MTKView!
     private var metalDevice : MTLDevice!
     private var metalQueue : MTLCommandQueue!
     private var pipelineState: MTLRenderPipelineState!
+    
     private var vertexBuffer: MTLBuffer!
     private var uniformBuffer: MTLBuffer!
     private var lineBuffer: MTLBuffer!
     
+    //MARK:- Metal Structs
     struct VertexIn {
         var pos : simd_float2
     }
@@ -35,6 +31,7 @@ public class Visualizer : UIView {
         var scale : Float
     }
     
+    //MARK:- Struct Arrays
     var uniform : [Uniform] = [Uniform(scale: 0.3)]
     var vertices : [VertexIn] = []
 
@@ -43,6 +40,7 @@ public class Visualizer : UIView {
     var lineVertices : [VertexIn] = []
     var lineUniforms : [LineUniform] = []
     
+    //MARK:- Uniform Setters
     var scaleValue : Float? {
         didSet{
             uniform = [Uniform(scale: scaleValue!)]
@@ -61,6 +59,7 @@ public class Visualizer : UIView {
         }
     }
     
+    //MARK:- Setup
     public required init(engine: AVAudioEngine) {
         self.engine = engine
         super.init(frame: .zero)
@@ -123,8 +122,8 @@ public class Visualizer : UIView {
         
         do {
             let pipelineDescriptor = MTLRenderPipelineDescriptor()
-            let shader = top + vertexInStruct + uniformStruct + uniformLineStruct + vertexOutStruct + vertexShader + fragmentShader
-            let library = try! metalDevice.makeLibrary(source: shader, options: nil)
+            let source = MetalShaders().fetchLibraryString()
+            let library = try! metalDevice.makeLibrary(source: source, options: nil)
             pipelineDescriptor.vertexFunction = library.makeFunction(name: "vertexShader")
             pipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragmentShader")
             

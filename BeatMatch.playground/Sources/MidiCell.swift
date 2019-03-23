@@ -7,6 +7,7 @@ protocol MidiCellDelegate : AnyObject {
 }
 
 public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
+    //MARK:- Vars
     public var sound : Sounds?{
         didSet{
             light.backgroundColor = sound?.color
@@ -17,17 +18,12 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
             setupNode()
         }
     }
-    
-    private var firstPlay = true
-    public var visualizer : Visualizer?
-    
     private var player = AVAudioPlayerNode()
     private var audioFile = AVAudioFile()
     
     weak var delegate : MidiCellDelegate?
     
-    public var cellIsPlaying = false
-    
+    //MARK:- View Components
     private lazy var buttonArea : UIView = {
         let view = UIView()
         view.layer.cornerRadius = 10
@@ -55,6 +51,7 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         return view
     }()
     
+    //MARK:- Setup
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -85,7 +82,6 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         light.centerYAnchor.constraint(equalTo: buttonArea.centerYAnchor).isActive = true
         light.widthAnchor.constraint(equalToConstant: 50).isActive = true
         light.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        //light.isHidden = true
         
         //button cover
         buttonArea.addSubview(buttonCover)
@@ -100,7 +96,6 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         do {
             audioFile = try AVAudioFile(forReading: url)
             let format = audioFile.processingFormat
-            //print(format)
             engine!.attach(player)
             engine!.connect(player, to: engine!.mainMixerNode, format: format)
         } catch let error {
@@ -108,21 +103,16 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
         }
     }
     
+    
+    //MARK:- Functions
     @objc func tapped(_ sender: UITapGestureRecognizer){
-        if AVCoordinator.shared.isPlaying || cellIsPlaying { return }
+        if AVCoordinator.shared.isPlaying { return }
         play()
-        //cellIsPlaying = true
         animate()
         delegate?.pressed(self)
     }
     
     public func play(){
-        if(firstPlay){
-//            player.installTap(onBus: 0, bufferSize: 1024, format: nil) { (buffer, _) in
-//                AVCoordinator.shared.rms(from: buffer, with: 1024, cell: self)
-//            }
-            firstPlay = false
-        }
         player.scheduleFile(audioFile, at: nil, completionHandler: nil)
         player.play()
     }
@@ -135,9 +125,5 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
                 self.light.transform = CGAffineTransform.identity
             })
         }
-    }
-    
-    deinit {
-        player.removeTap(onBus: 0)
     }
 }

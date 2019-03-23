@@ -1,6 +1,7 @@
 import UIKit
 
 public class ListneningLabel : UILabel {
+    //MARK:- Vars
     private var timer : Timer?
     private var dots = 0
     
@@ -20,6 +21,7 @@ public class ListneningLabel : UILabel {
         }
     }
     
+    //MARK:- Setup
     public required init() {
         super.init(frame: .zero)
         setupView()

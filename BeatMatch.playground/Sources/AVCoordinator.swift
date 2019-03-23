@@ -4,24 +4,13 @@ import Accelerate
 
 //Audio Visual Coordinator
 public final class AVCoordinator {
+    //MARK:- Reference Vars
     static let shared = AVCoordinator()
-    public var cells : [MidiCell] = []{
-        didSet{
-            var sounds = [String]()
-            for cell in cells {
-                sounds.append(cell.sound!.rawValue)
-            }
-            print("CELLS: ", sounds)
-        }
-    }
-    public var cellAccurateIndexes : [Int] = []{
-        didSet{
-            print("INDEXES: ", cellAccurateIndexes)
-        }
-    }
+    public var cells : [MidiCell] = []
+    public var cellAccurateIndexes : [Int] = [] //keeping track if cells are shifted around
     
-    //Playing
-    public var isPlaying = false
+    //MARK:- Playing
+    public var isPlaying = false //state var
     
     public func play(from text: String, completion: @escaping()->()){
         isPlaying = true
@@ -58,8 +47,8 @@ public final class AVCoordinator {
     }
     
     
-    //Testing
-    public var isTesting = false {
+    //MARK:- Testing
+    public var isTesting = false { //state var
         didSet {
             if !isTesting { //clear comparison strings
                 stringToTestFor = nil
@@ -88,7 +77,6 @@ public final class AVCoordinator {
                         return
                     }
                 }
-                
                 if inputPressStream?.count == stringToTestFor?.count {
                     testingEnded(withResult: true)
                 }
@@ -96,7 +84,7 @@ public final class AVCoordinator {
         }
     }
     
-    private func testingEnded(withResult result: Bool){
+    fileprivate func testingEnded(withResult result: Bool){
         isTesting = false
         if result {
              NotificationCenter.default.post(name: .passed, object: nil)
@@ -105,11 +93,11 @@ public final class AVCoordinator {
         }
     }
     
-    //Visualizer
+    //Mark:- Visualizer
     public var visualizer : Visualizer?
     private var normalSet = false
     private var values : [Float] = [0.3]
-    
+    private let fftSetup = vDSP_create_fftsetup(11, Int32(kFFTRadix2))
     
     public var buffer : AVAudioPCMBuffer? {
         didSet{
@@ -118,7 +106,7 @@ public final class AVCoordinator {
         }
     }
     
-    @objc func compute(){
+    @objc fileprivate func compute(){
         guard let channelData = buffer?.floatChannelData?[0] else {return}
         var val = Float(0);
         
@@ -137,9 +125,6 @@ public final class AVCoordinator {
             normalSet = false
         }
         
-        //fft setup
-        let fftSetup = vDSP_create_fftsetup(11, Int32(kFFTRadix2))
-        
         //output setup
         var realp = [Float](repeating: 0, count: 2048)
         var imagp = [Float](repeating: 0, count: 2048)
@@ -157,8 +142,8 @@ public final class AVCoordinator {
         var magnitude = [Float](repeating: 0, count: 1024)
         vDSP_zvmags(&output, 1, &magnitude, 1, 1024) //a^2 + b^2
         
-        var normalizingFactor : Float = 1.0/(2*2048)
         //normalizing
+        var normalizingFactor : Float = 1.0/(2*2048)
         var normalizedMagnitude = [Float](repeating: 0, count: 1024)
         vDSP_vsmul(&magnitude, 1, &normalizingFactor, &normalizedMagnitude, 1, 1024)
         
@@ -210,6 +195,8 @@ public final class AVCoordinator {
     }
 }
 
+//MARK:- Extensions
+//detecting beat input during testing state
 extension AVCoordinator : MidiCellDelegate {
     func pressed(_ cell: MidiCell) {
         if !isTesting {return}

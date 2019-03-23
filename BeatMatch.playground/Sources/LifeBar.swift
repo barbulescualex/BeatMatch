@@ -1,9 +1,11 @@
 import UIKit
 
 public class LifeBar : UILabel {
+    //MARK:- Vars
     public var lives = 5
     private var maxLives = 5
     
+    //MARK:- Setup
     public required init(lives: Int) {
         self.lives = lives
         self.maxLives = lives
@@ -25,6 +27,7 @@ public class LifeBar : UILabel {
         textAlignment = .left
     }
     
+    //MARK:- Functions
     public func minusOne(){
         text = ""
         lives = lives - 1

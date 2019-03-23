@@ -2,7 +2,7 @@ import UIKit
 import AVFoundation
 
 public class Game: UIViewController {
-    //MARK:- VARS
+    //MARK:- Vars
     private var engine = AVAudioEngine()
     private var level = 1 {
         didSet{
@@ -16,8 +16,9 @@ public class Game: UIViewController {
             }
         }
     }
-
     private var levelPatterns = [String]()
+    
+    
     //MARK:- VIEW COMPONENTS
     private lazy var levelLabel : UILabel = {
         let label = UILabel()
@@ -46,11 +47,12 @@ public class Game: UIViewController {
     private var listensBar : ListensBar!
     private var listeningLabel = ListneningLabel()
     
-    //Game vars
+    //MARK:- Game Vars
     private var difficulty : Difficulty!
     private var lives = 5
     private var listens = 3
     
+    //MARK:- Setup Functions
     public init(withDifficulty difficulty: Difficulty, withLives lives: Int?, withListensPerLevel listens: Int?) {
         self.difficulty = difficulty
         if let lives = lives, !(lives >= 10) {
@@ -95,7 +97,7 @@ public class Game: UIViewController {
         topStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -3).isActive = true
         topStack.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
-        //visualizer
+        //visualizer & midiView
         visualizer = Visualizer(engine: engine)
         AVCoordinator.shared.visualizer = visualizer
         midiView = MidiView(engine: engine, vis: visualizer)
@@ -148,6 +150,7 @@ public class Game: UIViewController {
         }
     }
     
+    //MARK:- Game Functions
     @objc func restart(_ sender: UIButton){
         if AVCoordinator.shared.isPlaying { return }
         AVCoordinator.shared.isTesting = false
@@ -194,7 +197,6 @@ public class Game: UIViewController {
     @objc func levelPassed(notification: NSNotification){
         listeningLabel.isHidden = true
         print("level passed")
-        listensBar.reset()
         if(level == levelPatterns.count){//win!
             let win = EndSceneView(type: .win)
             win.delegate = self
@@ -221,6 +223,7 @@ public class Game: UIViewController {
                 }, completion: { (_) in
                     yay.removeFromSuperview()
                     self.level = self.level + 1
+                    self.listensBar.reset()
                 })
             }
         }
@@ -233,7 +236,7 @@ public class Game: UIViewController {
     }
     
 }
-
+//MARK:- Delegates
 extension Game : EndSceneViewDelegate {
     func closeView(_ sender: EndSceneView) {
         sender.removeFromSuperview()
@@ -272,7 +275,7 @@ public enum Difficulty {
     public var pattern : [String] {
         switch self {
         case .baby:
-            return ["1","1","1","1","1"]
+            return ["111","111","111","111","111"]
         case .easy:
             return ["001 001 0010001"]
         case .normal:
