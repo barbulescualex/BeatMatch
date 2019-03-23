@@ -16,9 +16,8 @@ public class Game: UIViewController {
             }
         }
     }
-    private var levelPatternsHard = ["001 001 0010001","0321 0321 0303 0321","041 041 04041 041 04","004121 444 333 13"]
-    private var levelPatternsEasy = ["1"]
-    private var levelPatternsNormal = ["0"]
+
+    private var levelPatterns = [String]()
     //MARK:- VIEW COMPONENTS
     private lazy var levelLabel : UILabel = {
         let label = UILabel()
@@ -43,13 +42,27 @@ public class Game: UIViewController {
     
     private var visualizer : Visualizer!
     private var midiView : MidiView!
-    private var lifeBar = LifeBar()
-    private var listensBar = ListensBar()
+    private var lifeBar : LifeBar!
+    private var listensBar : ListensBar!
     private var listeningLabel = ListneningLabel()
     
-    public init() {
+    //Game vars
+    private var difficulty : Difficulty!
+    private var lives = 5
+    private var listens = 3
+    
+    public init(withDifficulty difficulty: Difficulty, withLives lives: Int?, withListensPerLevel listens: Int?) {
+        self.difficulty = difficulty
+        if let lives = lives {
+            self.lives = lives
+        }
+        if let listens = listens {
+            self.listens = listens
+        }
+        self.levelPatterns = difficulty.pattern
         super.init(nibName: nil, bundle: nil)
         setupEngine()
+        setupViews()
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -59,7 +72,6 @@ public class Game: UIViewController {
     public override func viewDidLoad() {
         NotificationCenter.default.addObserver(self, selector: #selector(levelFailed(notification:)), name: .failed, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(levelPassed(notification:)), name: .passed, object: nil)
-        setupViews()
     }
     
     fileprivate func setupViews(){
@@ -103,12 +115,14 @@ public class Game: UIViewController {
         visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
         
         //LifeBar
+        lifeBar = LifeBar(lives: lives)
         view.addSubview(lifeBar)
         lifeBar.topAnchor.constraint(equalTo: topStack.bottomAnchor).isActive = true
         lifeBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 3).isActive = true
         lifeBar.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
         //ListensBar
+        listensBar = ListensBar(listens: listens)
         view.addSubview(listensBar)
         listensBar.delegate = self
         listensBar.bottomAnchor.constraint(equalTo: midiView.topAnchor, constant: -5).isActive = true
@@ -147,7 +161,7 @@ public class Game: UIViewController {
         listeningLabel.isHidden = true
         print("level failed")
         lifeBar.minusOne()
-        if (lifeBar.hearts == 0){//GAME OVER
+        if (lifeBar.lives == 0){//GAME OVER
             let gameOver = EndSceneView(type: .over)
             gameOver.delegate = self
             view.addSubview(gameOver)
@@ -175,15 +189,13 @@ public class Game: UIViewController {
                 })
             }
         }
-        
-        
     }
     
     @objc func levelPassed(notification: NSNotification){
         listeningLabel.isHidden = true
         print("level passed")
         listensBar.reset()
-        if(level == levelPatternsEasy.count){//win!
+        if(level == levelPatterns.count){//win!
             let win = EndSceneView(type: .win)
             win.delegate = self
             view.addSubview(win)
@@ -215,7 +227,7 @@ public class Game: UIViewController {
     }
     
     fileprivate func startListening(){
-        let pattern = levelPatternsEasy[level-1]
+        let pattern = levelPatterns[level-1]
         AVCoordinator.shared.stringToTestFor = pattern
         listeningLabel.isHidden = false
     }
@@ -238,7 +250,7 @@ extension Game : ListensBarDelegate {
             AVCoordinator.shared.isTesting = false
         }
         listeningLabel.isHidden = true
-        let pattern = levelPatternsEasy[level-1]
+        let pattern = levelPatterns[level-1]
         AVCoordinator.shared.play(from: pattern) {
             self.startListening()
             self.listensBar.minusOne()
@@ -249,5 +261,25 @@ extension Game : ListensBarDelegate {
 extension Notification.Name {
     static let passed = Notification.Name("passed")
     static let failed = Notification.Name("failed")
+}
+
+public enum Difficulty {
+    case baby
+    case easy
+    case normal
+    case hard
+    
+    public var pattern : [String] {
+        switch self {
+        case .baby:
+            return ["1"]
+        case .easy:
+            return ["11"]
+        case .normal:
+            return ["111"]
+        case .hard:
+            return ["1111"]
+        }
+    }
 }
 

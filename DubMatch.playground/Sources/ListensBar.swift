@@ -5,12 +5,15 @@ protocol ListensBarDelegate : AnyObject {
 }
 
 public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
-    private var speakers = 3
+    private var listens = 3
+    private var maxListens = 3
     private var labels = [UILabel]()
     
     weak var delegate : ListensBarDelegate?
     
-    public required init() {
+    public required init(listens: Int) {
+        self.listens = listens
+        self.maxListens = listens
         super.init(frame: .zero)
         setupView()
     }
@@ -23,7 +26,7 @@ public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
         translatesAutoresizingMaskIntoConstraints = false
         axis = .horizontal
         distribution = .fill
-        for _ in 0..<3 {
+        for _ in 0..<maxListens {
             let label = UILabel()
             label.font = UIFont.systemFont(ofSize: 20)
             label.text = "🔉"
@@ -37,16 +40,16 @@ public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
     
     public func minusOne(){
         UIView.animate(withDuration: 0.2) {
-            self.labels[self.speakers-1].isHidden = true
+            self.labels[self.listens-1].isHidden = true
         }
-        speakers = speakers - 1
+        listens = listens - 1
     }
     
     public func reset(){
-        UIView.animate(withDuration: 0.2) {
-            self.labels[0].isHidden = false
-            self.labels[1].isHidden = false
-            self.labels[2].isHidden = false
+        for label in labels {
+            UIView.animate(withDuration: 0.2) {
+                label.isHidden = false
+            }
         }
         UIView.animate(withDuration: 0.1, animations: {
             self.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
@@ -55,11 +58,11 @@ public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
                 self.transform = CGAffineTransform.identity
             })
         }
-        speakers = 3
+        listens = maxListens
     }
     
     @objc func tapped(_ sender: UIGestureRecognizer){
-        if speakers != 0 && !AVCoordinator.shared.isPlaying{
+        if listens != 0 && !AVCoordinator.shared.isPlaying{
               delegate?.listensBarTapped()
         }
     }

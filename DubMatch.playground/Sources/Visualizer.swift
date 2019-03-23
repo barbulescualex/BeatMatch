@@ -46,9 +46,9 @@ public class Visualizer : UIView {
     var scaleValue : Float? {
         didSet{
             uniform = [Uniform(scale: scaleValue!)]
-//            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-//            lineUniforms = []
-//            metalView.draw()
+            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
+            lineUniforms = []
+            metalView.draw()
         }
     }
     
@@ -57,7 +57,7 @@ public class Visualizer : UIView {
             for mag in lineMagnitudes! {
                 lineUniforms.append(LineUniform(scale: 1 + mag))
             }
-//            lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
+            lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
         }
     }
     
@@ -66,7 +66,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-//        setupMetal()
+        setupMetal()
         setupEngineTap()
     }
     

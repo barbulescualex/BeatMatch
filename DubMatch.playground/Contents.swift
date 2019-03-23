@@ -10,4 +10,4 @@
 */
 import PlaygroundSupport
 
-PlaygroundPage.current.liveView = Game()
+PlaygroundPage.current.liveView = Game(withDifficulty: .hard, withLives:10, withListensPerLevel: 5)

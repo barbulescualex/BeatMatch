@@ -141,7 +141,7 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         //content label
         let content = UILabel()
         content.font = UIFont.systemFont(ofSize: 20)
-        content.textColor = .lightGray
+        content.textColor = .black
         content.translatesAutoresizingMaskIntoConstraints = false
         content.textAlignment = .center
         content.numberOfLines = 0
