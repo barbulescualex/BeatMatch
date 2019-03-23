@@ -1,9 +1,10 @@
 import UIKit
 
-public class LifeBar : UILabel {
+public class LifeBar : UIStackView {
     //MARK:- Vars
     public var lives = 5
     private var maxLives = 5
+    private var labels = [UILabel]()
     
     //MARK:- Setup
     public required init(lives: Int) {
@@ -13,42 +14,55 @@ public class LifeBar : UILabel {
         setupView()
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required init(coder aDecoder: NSCoder) {
         fatalError()
     }
     
     fileprivate func setupView(){
         translatesAutoresizingMaskIntoConstraints = false
-        font = UIFont.systemFont(ofSize: 20)
-        text = "❤"
-        for _ in 0..<(maxLives-1) {
-            text = text! + "❤"
+        axis = .horizontal
+        distribution = .fill
+        for _ in 0..<maxLives {
+            let label = UILabel()
+            label.font = UIFont.systemFont(ofSize: 20)
+            label.text = "❤"
+            addArrangedSubview(label)
+            labels.append(label)
         }
-        textAlignment = .left
     }
     
     //MARK:- Functions
     public func minusOne(){
-        text = ""
-        lives = lives - 1
-        for _ in 0..<lives {
-            text = text! + "❤"
+        let label = labels[lives-1]
+        UIView.animate(withDuration: 0.1, animations: {
+            label.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        }) { (_) in
+            UIView.animate(withDuration: 0.1, animations: {
+                label.transform = CGAffineTransform(scaleX: 0, y: 0)
+            }, completion: { (_) in
+                label.isHidden = true
+                label.transform = CGAffineTransform.identity
+            })
         }
+        lives = lives - 1
     }
     
     public func reset(){
-        lives = maxLives
-        text = "❤"
-        for _ in 0..<(maxLives-1) {
-            text = text! + "❤"
-        }
-        UIView.animate(withDuration: 0.1, animations: {
-            self.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
-        }) { (_) in
+        for label in labels {
+            if label.isHidden == false {
+                continue
+            }
+            label.isHidden = false
+            label.text = "❤"
             UIView.animate(withDuration: 0.1, animations: {
-                self.transform = CGAffineTransform.identity
-            })
+                label.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+            }) { (_) in
+                UIView.animate(withDuration: 0.1, animations: {
+                    label.transform = CGAffineTransform.identity
+                })
+            }
         }
+        lives = maxLives
     }
 }
 

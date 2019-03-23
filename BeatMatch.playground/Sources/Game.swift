@@ -7,13 +7,13 @@ public class Game: UIViewController {
     private var level = 1 {
         didSet{
             levelLabel.text = "Level: \(level)"
-            UIView.animate(withDuration: 0.1, animations: {
-                self.levelLabel.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
-            }) { (_) in
-                UIView.animate(withDuration: 0.1, animations: {
-                    self.levelLabel.transform = CGAffineTransform.identity
-                })
-            }
+//            UIView.animate(withDuration: 0.1, animations: {
+//                self.levelLabel.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+//            }) { (_) in
+//                UIView.animate(withDuration: 0.1, animations: {
+//                    self.levelLabel.transform = CGAffineTransform.identity
+//                })
+//            }
         }
     }
     private var levelPatterns = [String]()
