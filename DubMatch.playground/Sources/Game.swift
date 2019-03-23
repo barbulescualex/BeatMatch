@@ -56,7 +56,7 @@ public class Game: UIViewController {
         if let lives = lives, !(lives >= 10) {
             self.lives = lives
         }
-        if let listens = listens, !(listens !>= 5) {
+        if let listens = listens, !(listens >= 5) {
             self.listens = listens
         }
         self.levelPatterns = difficulty.pattern
