@@ -5,7 +5,7 @@
  
  _______________________________________
  
- Welcome to my playground! I present to you a game made that uses AVFoundation and the Metal framework to provide a beatiful audio visual experience
+ Welcome to my playground! I present to you a game that uses the AVFoundation, Metal and Accelerate frameworks to provide a beatiful audio visual experience.
  
 */
 import PlaygroundSupport
