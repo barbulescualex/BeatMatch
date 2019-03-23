@@ -5,8 +5,20 @@ import Accelerate
 //Audio Visual Coordinator
 public final class AVCoordinator {
     static let shared = AVCoordinator()
-    public var cells : [MidiCell] = []
-    
+    public var cells : [MidiCell] = []{
+        didSet{
+            var sounds = [String]()
+            for cell in cells {
+                sounds.append(cell.sound!.rawValue)
+            }
+            print("CELLS: ", sounds)
+        }
+    }
+    public var cellAccurateIndexes : [Int] = []{
+        didSet{
+            print("INDEXES: ", cellAccurateIndexes)
+        }
+    }
     
     //Playing
     public var isPlaying = false
@@ -38,8 +50,9 @@ public final class AVCoordinator {
         }
         
         guard let index = Int(str) else {return}
-        if !cells.indices.contains(index) {return}
-        let cell = cells[index]
+        guard let accurateIndex = cellAccurateIndexes.firstIndex(of: index) else {return}
+        if !cells.indices.contains(accurateIndex) {return}
+        let cell = cells[accurateIndex]
         cell.play()
         cell.animate()
     }
@@ -201,8 +214,9 @@ extension AVCoordinator : MidiCellDelegate {
     func pressed(_ cell: MidiCell) {
         if !isTesting {return}
         guard let index = cells.firstIndex(of: cell) else {return}
+        let updatedIndex = cellAccurateIndexes[index]
         print("found index of cell from delegate")
-        let char = Character(String(index))
+        let char = Character(String(updatedIndex))
         if inputPressStream != nil {
             inputPressStream!.append(char)
         } else {

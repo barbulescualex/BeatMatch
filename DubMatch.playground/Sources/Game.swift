@@ -48,8 +48,8 @@ public class Game: UIViewController {
     
     //Game vars
     private var difficulty : Difficulty!
-    private var lives = 10
-    private var listens = 5
+    private var lives = 5
+    private var listens = 3
     
     public init(withDifficulty difficulty: Difficulty, withLives lives: Int?, withListensPerLevel listens: Int?) {
         self.difficulty = difficulty
@@ -272,9 +272,9 @@ public enum Difficulty {
     public var pattern : [String] {
         switch self {
         case .baby:
-            return ["1"]
+            return ["1 12 234 3"]
         case .easy:
-            return ["11"]
+            return ["001 001 0010001"]
         case .normal:
             return ["111"]
         case .hard:

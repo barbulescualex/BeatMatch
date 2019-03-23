@@ -96,12 +96,15 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
         cell.delegate = AVCoordinator.shared
         if !cellSwapped.0 {
             AVCoordinator.shared.cells.append(cell)
+            AVCoordinator.shared.cellAccurateIndexes.append(indexPath.item)
         } else {
             let swapFrom = cellSwapped.1
             let swapTo = cellSwapped.2
             AVCoordinator.shared.cells.remove(at: swapFrom)
-            print("removed")
+            let indexReferenceToMove = AVCoordinator.shared.cellAccurateIndexes[swapFrom]
+            AVCoordinator.shared.cellAccurateIndexes.remove(at: swapFrom)
             AVCoordinator.shared.cells.insert(cell, at: swapTo)
+            AVCoordinator.shared.cellAccurateIndexes.insert(indexReferenceToMove, at: swapTo)
             cellSwapped = (false,0,0)
         }
         return cell

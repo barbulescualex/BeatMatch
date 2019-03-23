@@ -46,9 +46,9 @@ public class Visualizer : UIView {
     var scaleValue : Float? {
         didSet{
             uniform = [Uniform(scale: scaleValue!)]
-            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
-            lineUniforms = []
-            metalView.draw()
+//            uniformBuffer = metalDevice.makeBuffer(bytes: uniform, length: uniform.count * MemoryLayout<Uniform>.stride, options: [])!
+//            lineUniforms = []
+//            metalView.draw()
         }
     }
     
@@ -57,7 +57,7 @@ public class Visualizer : UIView {
             for mag in lineMagnitudes! {
                 lineUniforms.append(LineUniform(scale: 1 + mag))
             }
-            lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
+            //lineBuffer = metalDevice.makeBuffer(bytes: lineUniforms, length: lineUniforms.count * MemoryLayout<LineUniform>.stride, options: [])!
         }
     }
     
@@ -66,7 +66,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-        setupMetal()
+        //setupMetal()
         setupEngineTap()
     }
     
@@ -122,7 +122,15 @@ public class Visualizer : UIView {
         metalQueue = metalDevice.makeCommandQueue()!
         
         do {
-            pipelineState = try buildRenderPipelineWith(device: metalDevice, metalKitView: metalView)
+            let pipelineDescriptor = MTLRenderPipelineDescriptor()
+            let shader = top + vertexInStruct + uniformStruct + uniformLineStruct + vertexOutStruct + vertexShader + fragmentShader
+            let library = try! metalDevice.makeLibrary(source: shader, options: nil)
+            pipelineDescriptor.vertexFunction = library.makeFunction(name: "vertexShader")
+            pipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragmentShader")
+            
+            pipelineDescriptor.colorAttachments[0].pixelFormat = metalView.colorPixelFormat
+            
+            pipelineState = try metalDevice.makeRenderPipelineState(descriptor: pipelineDescriptor)
         } catch {
             print(error)
         }
@@ -162,18 +170,6 @@ extension Visualizer : MTKViewDelegate {
         renderEncoder.endEncoding()
         commandBuffer.present(view.currentDrawable!)
         commandBuffer.commit()
-    }
-    
-    func buildRenderPipelineWith(device: MTLDevice, metalKitView: MTKView) throws -> MTLRenderPipelineState {
-        let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        let shader = top + vertexInStruct + uniformStruct + uniformLineStruct + vertexOutStruct + vertexShader + fragmentShader
-        let library = try! device.makeLibrary(source: shader, options: nil)
-        pipelineDescriptor.vertexFunction = library.makeFunction(name: "vertexShader")
-        pipelineDescriptor.fragmentFunction = library.makeFunction(name: "fragmentShader")
-        
-        pipelineDescriptor.colorAttachments[0].pixelFormat = metalKitView.colorPixelFormat
-        
-        return try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
     }
 }
 
