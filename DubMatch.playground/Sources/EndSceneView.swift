@@ -8,7 +8,7 @@ public enum EndMessage {
     var title : String {
         switch self {
         case .win:
-            return "YOU WIN!"
+            return "YOU WON!"
         case .over:
             return "GAME OVER"
         }
@@ -69,7 +69,7 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
     
     let viewArea : UIView =  {
         let view = UIView()
-        view.backgroundColor = .white
+        //view.backgroundColor = .white
         view.layer.cornerRadius = 10
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -134,21 +134,39 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.text = type.prefixEmoji + type.title + "!" + type.suffixEmoji
-        label.textColor = .lightGray
+        label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowRadius = 3.0
+        label.layer.shadowOpacity = 1.0
+        label.layer.shadowOffset = CGSize(width: 4, height: 4)
+        label.layer.masksToBounds = false
+        
         //content label
-        let content = UILabel()
-        content.font = UIFont.systemFont(ofSize: 20)
-        content.textColor = .black
+        let content = UIView()
         content.translatesAutoresizingMaskIntoConstraints = false
-        content.textAlignment = .center
-        content.numberOfLines = 0
+        content.layer.cornerRadius = 10
+        content.clipsToBounds = true
+        content.backgroundColor = .white
+        
+        content.layer.shadowColor = UIColor.black.cgColor
+        content.layer.shadowRadius = 3.0
+        content.layer.shadowOpacity = 1.0
+        content.layer.shadowOffset = CGSize(width: 4, height: 4)
+        content.layer.masksToBounds = false
+        
+        let contentLabel = UILabel()
+        contentLabel.font = UIFont.systemFont(ofSize: 20)
+        contentLabel.textColor = .black
+        contentLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentLabel.textAlignment = .center
+        contentLabel.numberOfLines = 0
         if type == .over {
-            content.text = "Try again!😜 You can always make the game easier😉, just go into your playground and change the input parameters for the Game object!😎"
+            contentLabel.text = "Try again!😜 You can always make the game easier😉, just go into your playground and change the input parameters for the Game object!😎"
         } else {
-            content.text = "Congratulations, see you at WWDC 2019!👋🏻☺️"
+            contentLabel.text = "Thanks for stopping by my playground, see you at WWDC 2019!👋🏻☺️"
         }
         
         viewArea.addSubview(label)
@@ -157,10 +175,17 @@ public class EndSceneView : UIView, UIGestureRecognizerDelegate {
         label.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
         viewArea.addSubview(content)
-        content.topAnchor.constraint(equalTo: label.bottomAnchor).isActive = true
-        content.trailingAnchor.constraint(equalTo: viewArea.trailingAnchor, constant: 5).isActive = true
-        content.leadingAnchor.constraint(equalTo: viewArea.leadingAnchor, constant: -5).isActive = true
-        content.bottomAnchor.constraint(equalTo: viewArea.bottomAnchor, constant: -5).isActive = true
+        content.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 7.5).isActive = true
+        content.trailingAnchor.constraint(equalTo: viewArea.trailingAnchor, constant: -7.5).isActive = true
+        content.leadingAnchor.constraint(equalTo: viewArea.leadingAnchor, constant: 7.5).isActive = true
+        content.bottomAnchor.constraint(equalTo: viewArea.bottomAnchor, constant: -7.5).isActive = true
+        
+        content.addSubview(contentLabel)
+        contentLabel.topAnchor.constraint(equalTo: content.topAnchor, constant: 5).isActive = true
+        contentLabel.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -5).isActive = true
+        contentLabel.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 5).isActive = true
+        contentLabel.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -5).isActive = true
+        
     }
     
     @objc func outsidePressed(_ sender: UIGestureRecognizer){

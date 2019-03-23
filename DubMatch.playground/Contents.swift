@@ -10,4 +10,4 @@
 */
 import PlaygroundSupport
 
-PlaygroundPage.current.liveView = Game(withDifficulty: .easy, withLives: nil, withListensPerLevel: nil)
+PlaygroundPage.current.liveView = Game(withDifficulty: .baby, withLives: nil, withListensPerLevel: nil)

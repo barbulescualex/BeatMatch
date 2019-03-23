@@ -204,7 +204,7 @@ public class Game: UIViewController {
             win.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
             win.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         } else {
-            let emotion = EmotionMessage.make(index: level)
+            let emotion = EmotionMessage.make(index: level-1)
             let yay = EmotionView(message: emotion)
             view.addSubview(yay)
             yay.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -272,7 +272,7 @@ public enum Difficulty {
     public var pattern : [String] {
         switch self {
         case .baby:
-            return ["1 12 234 3"]
+            return ["1","1","1","1","1"]
         case .easy:
             return ["001 001 0010001"]
         case .normal:

@@ -6,7 +6,6 @@ public enum EmotionMessage : String, CaseIterable {
     case AWESOME
     case SWEET
     case DOPE
-    case EASY
     
     case AWE
     
@@ -20,8 +19,6 @@ public enum EmotionMessage : String, CaseIterable {
             return "😎"
         case .DOPE:
             return "😈"
-        case .EASY:
-            return "😴"
         case .AWE:
             return "😢"
         }
@@ -37,8 +34,6 @@ public enum EmotionMessage : String, CaseIterable {
             return "sweet"
         case .DOPE:
             return "dope"
-        case .EASY:
-            return "easy"
         case .AWE:
             return "awe"
         }
