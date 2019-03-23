@@ -46,8 +46,16 @@ public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
     
     //MARK:- Functions
     public func minusOne(){
-        UIView.animate(withDuration: 0.2) {
-            self.labels[self.listens-1].isHidden = true
+        let label = labels[listens-1]
+        UIView.animate(withDuration: 0.1, animations: {
+            label.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+        }) { (_) in
+            UIView.animate(withDuration: 0.1, animations: {
+                label.transform = CGAffineTransform(scaleX: 0, y: 0)
+            }, completion: { (_) in
+                label.isHidden = true
+                label.transform = CGAffineTransform.identity
+            })
         }
         listens = listens - 1
         timer?.invalidate()
@@ -55,16 +63,18 @@ public class ListensBar : UIStackView, UIGestureRecognizerDelegate {
     
     public func reset(){
         for label in labels {
-            UIView.animate(withDuration: 0.2) {
-                label.isHidden = false
+            if label.isHidden == false {
+                continue
             }
-        }
-        UIView.animate(withDuration: 0.1, animations: {
-            self.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
-        }) { (_) in
+            label.isHidden = false
+            label.text = "🔉"
             UIView.animate(withDuration: 0.1, animations: {
-                self.transform = CGAffineTransform.identity
-            })
+                label.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
+            }) { (_) in
+                UIView.animate(withDuration: 0.1, animations: {
+                    label.transform = CGAffineTransform.identity
+                })
+            }
         }
         listens = maxListens
     }
