@@ -1,15 +1,15 @@
 /*:
  #### How To Play:
  
- Tap on the speaker to listen to the beat
+ Tap on the speaker to listen to the beat.
  
  ![🔉🔉🔉](speakers.png)
  
- When you see the listening... icon start playing back the beat!
+ When you see the listening icon start playing back the beat!
  
  ![Listening...](listening.png)
  
- Don't like the layout on your midi pad? Just hold down on a button to move it!
+ Don't like the layout on your MidiPad? Just hold down on a button to move it!
  
  
  #### Difficulty Levels:

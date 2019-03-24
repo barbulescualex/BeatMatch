@@ -65,7 +65,7 @@ public class Visualizer : UIView {
         super.init(frame: .zero)
         makeVertices()
         setupView()
-        //setupMetal()
+        setupMetal()
         setupEngineTap()
     }
     
