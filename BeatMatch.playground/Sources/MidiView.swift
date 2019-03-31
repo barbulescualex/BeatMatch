@@ -6,11 +6,10 @@ public class MidiView : UIView {
     private var identifier = "cell"
     private var sounds = [Sounds.kick,Sounds.snare,Sounds.ghostSnare,Sounds.chime,Sounds.hiHat,Sounds.perc]
     private var engine : AVAudioEngine
-    private var visualizer : Visualizer?
     private var cellSwapped = (false,0,0) //Flag for our AVCoordinator to swap cell from index to index
     
     //MARK:- View Components
-    private lazy var collectionView : UICollectionView = {
+    public lazy var collectionView : UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 1
         layout.minimumInteritemSpacing = 1
@@ -28,15 +27,20 @@ public class MidiView : UIView {
     }()
     
     //MARK:- Setup
-    public required init(engine: AVAudioEngine, vis: Visualizer) {
+    public required init(engine: AVAudioEngine) {
         self.engine = engine
-        self.visualizer = vis
         super.init(frame: .zero)
         setupMidi()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+    
+    public override func didMoveToSuperview() {
+        AVCoordinator.shared.cells = []
+        AVCoordinator.shared.cellAccurateIndexes = []
+        collectionView.reloadData()
     }
     
     fileprivate func setupMidi(){
@@ -120,8 +124,8 @@ extension MidiView : UICollectionViewDataSource, UICollectionViewDelegate, UICol
     
     //sizing
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = collectionView.bounds.width / 3 - 9
-        let height = collectionView.bounds.height / 2 - 6
+        let width = collectionView.bounds.width / 3 - 10
+        let height = collectionView.bounds.height / 2 - 7
         return CGSize(width: width, height: height)
     }
     

@@ -9,7 +9,7 @@
  
  ![Listening...](listening.png)
  
- Don't like the layout on your MidiPad? Just hold down on a button to move it!
+ Don't like the layout on your MidiPad? Just hold down a button to move it!
  
  
  #### Difficulty Levels:
@@ -18,15 +18,23 @@
  
  .easy - for when it's been a long day reviewing applications 😴
  
- .normal - the standard difficulty level found by studying N users (N=1=me)
+ .normal - the standard difficulty level found by studying n users (n=1=me)
  
  .hard - I made all of these up and I still can't win on this mode 🙄
  
-*/
+ #### Other Inputs:
+ 
+ ❤️ Lives - you can override the default lives (up to 10)
+ 
+ 🔉 Listens - you can override the default listens (up to 5)
+ 
+ */
 
-//#-hidden-code
 import PlaygroundSupport
 
-PlaygroundPage.current.liveView = Game(withDifficulty: .baby, withLives: nil, withListensPerLevel: nil)
-//#-end-hidden-code
+let game = Game(withDifficulty: .normal,
+    withLives: 5,
+    withListensPerLevel: 3)
+
+PlaygroundPage.current.liveView = game
 

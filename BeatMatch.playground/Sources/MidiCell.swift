@@ -20,6 +20,7 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     private var player = AVAudioPlayerNode()
     private var audioFile = AVAudioFile()
+    private var cellCanPlay = true
     
     weak var delegate : MidiCellDelegate?
     
@@ -107,8 +108,14 @@ public class MidiCell : UICollectionViewCell, UIGestureRecognizerDelegate {
     //MARK:- Functions
     @objc func tapped(_ sender: UITapGestureRecognizer){
         if AVCoordinator.shared.isPlaying { return }
+        if !cellCanPlay {return}
         play()
         animate()
+        cellCanPlay = false
+        let time = DispatchTimeInterval.milliseconds(sound!.msTime)
+        DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + time) {
+            self.cellCanPlay = true
+        }
         delegate?.pressed(self)
     }
     

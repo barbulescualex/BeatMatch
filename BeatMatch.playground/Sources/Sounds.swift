@@ -35,4 +35,21 @@ public enum Sounds : String, CaseIterable {
             return UIColor.red
         }
     }
+    
+    var msTime: Int {
+        switch self {
+        case .kick:
+            return 275
+        case .snare:
+            return 21
+        case .chime:
+            return 9
+        case .hiHat:
+            return 17
+        case .ghostSnare:
+            return 295
+        case .perc:
+            return 17
+        }
+    }
 }

@@ -18,6 +18,13 @@ public class Game: UIViewController {
     }
     private var levelPatterns = [String]()
     
+    public override func viewDidLayoutSubviews() {
+        if midiView == nil {
+            return
+        }
+        print("invalidated layout")
+        midiView.collectionView.collectionViewLayout.invalidateLayout()
+    }
     
     //MARK:- VIEW COMPONENTS
     private lazy var levelLabel : UILabel = {
@@ -100,21 +107,25 @@ public class Game: UIViewController {
         //visualizer & midiView
         visualizer = Visualizer(engine: engine)
         AVCoordinator.shared.visualizer = visualizer
-        midiView = MidiView(engine: engine, vis: visualizer)
+        midiView = MidiView(engine: engine)
         view.addSubview(visualizer)
-        view.addSubview(midiView)
+        view.addSubview(midiView!)
         visualizer.topAnchor.constraint(equalTo: topStack.bottomAnchor).isActive = true
         visualizer.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         visualizer.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        
-        midiView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        midiView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        midiView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        if let superview = view.superview {
+            midiView!.bottomAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        } else {
+            midiView!.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0 ).isActive = true
+        }
+        midiView!.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+        midiView!.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        midiView!.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         let midiHeight = view.bounds.height*0.2
-        midiView.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
+        midiView!.heightAnchor.constraint(equalToConstant: midiHeight).isActive = true
         
-        visualizer.bottomAnchor.constraint(equalTo: midiView.topAnchor).isActive = true
+        visualizer.bottomAnchor.constraint(equalTo: midiView!.topAnchor).isActive = true
         
         //LifeBar
         lifeBar = LifeBar(lives: lives)
@@ -127,7 +138,7 @@ public class Game: UIViewController {
         listensBar = ListensBar(listens: listens)
         view.addSubview(listensBar)
         listensBar.delegate = self
-        listensBar.bottomAnchor.constraint(equalTo: midiView.topAnchor, constant: -5).isActive = true
+        listensBar.bottomAnchor.constraint(equalTo: midiView!.topAnchor, constant: -5).isActive = true
         listensBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 5).isActive = true
         listensBar.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
@@ -135,7 +146,7 @@ public class Game: UIViewController {
         view.addSubview(listeningLabel)
         listeningLabel.isHidden = true
         listeningLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -5).isActive = true
-        listeningLabel.bottomAnchor.constraint(equalTo: midiView.topAnchor, constant: -5).isActive = true
+        listeningLabel.bottomAnchor.constraint(equalTo: midiView!.topAnchor, constant: -5).isActive = true
         listeningLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
     }
     
